@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAssess - Join a Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --gov-primary: #205493;          /* Standard government blue */
+            --gov-secondary: #112e51;        /* Darker blue for contrast */
+            --gov-accent: #02bfe7;           /* Light blue accent */
+            --gov-light: #f1f9fc;            /* Very light blue tint for background */
+            --gov-border: #dce4ef;           /* Light blue-gray for borders */
+            --gov-text: #212121;             /* Dark gray for text */
+            --gov-header-bg: #ffffff;        /* White header background */
+        }
+        body {
+            background-color: var(--gov-light);
+            color: var(--gov-text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .gov-header {
+            background-color: var(--gov-header-bg);
+            border-bottom: 3px solid var(--gov-primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .header-title {
+            color: var(--gov-secondary);
+        }
+        .header-subtitle {
+            color: var(--gov-primary);
+        }
+        .gov-card {
+            background-color: #ffffff;
+            border: 1px solid var(--gov-border);
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .gov-label {
+            font-weight: 600;
+            color: #212121;
+            margin-bottom: 0.25rem;
+        }
+        .gov-input {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #aeb0b5;
+            border-radius: 2px;
+            color: #212121;
+            background-color: #ffffff;
+            transition: border-color 0.2s ease;
+        }
+        .gov-input:focus {
+            outline: none;
+            border-color: var(--gov-primary);
+            box-shadow: 0 0 0 2px rgba(32, 84, 147, 0.3);
+        }
+        .gov-select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23212121' d='M6 9L0 3h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.75rem;
+            padding-right: 2.5rem;
+            appearance: none;
+        }
+        .gov-button {
+            background-color: var(--gov-primary);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .gov-button:hover {
+            background-color: var(--gov-secondary);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .quiz-container {
+            border: 1px solid var(--gov-border);
+            background-color: #ffffff;
+        }
+        .timer-display {
+            color: #e31c3d;
+            font-weight: bold;
+        }
+        .section-title {
+            color: var(--gov-primary);
+            font-weight: bold;
+            border-bottom: 2px solid var(--gov-border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="gov-header py-3">
+        <div class="max-w-6xl mx-auto px-4 flex items-center">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-bold header-title">EduAssess</h1>
+                <div class="ml-4 pl-4 border-l border-gray-300">
+                    <p class="header-subtitle font-medium">Ministry of Education</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto my-8 px-4">
+        <div class="gov-card p-8">
+            <h2 class="section-title text-2xl text-center">Join a Quiz</h2>
+            <p class="text-gray-600 text-center mb-6">Enter your information below to participate in the assessment</p>
+
+            <!-- Join Form -->
+            <div id="joinForm">
+
+                <div class="form-group">
+                    <label for="Name" class="gov-label">Name</label>
+                    <input id="Name" class="gov-input" placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="playerName" class="gov-label">Preferred Name</label>
+                    <input id="playerName" class="gov-input" placeholder="Enter your preferred name">
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber" class="gov-label">Phone Number</label>
+                    <input id="phoneNumber" type="tel" class="gov-input" placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="emailId" class="gov-label">Email ID</label>
+                    <input id="emailId" type="email" class="gov-input" placeholder="Enter your email address">
+                </div>
+
+                <div class="form-group">
+                    <label for="districtSelect" class="gov-label">Select District</label>
+                    <select id="districtSelect" class="gov-input gov-select">
+                        <option value="">Select District</option>
+                        <option value="Bhopal">Bhopal</option>
+                        <option value="Indore">Indore</option>
+                        <option value="Jabalpur">Jabalpur</option>
+                        <option value="Gwalior">Gwalior</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="gamePin" class="gov-label">Game PIN</label>
+                    <input id="gamePin" class="gov-input" placeholder="Enter the game PIN">
+                </div>
+
+                <button onclick="joinQuiz()" class="gov-button w-full mt-6">
+                    Join Quiz
+                </button>
+            </div>
+
+            <!-- Quiz Questions -->
+            <div id="quizContainer" class="hidden mt-8 text-center quiz-container p-6">
+                <h3 id="questionText" class="text-xl font-semibold text-gray-800 mb-6"></h3>
+                
+                <div id="options" class="mt-6 grid grid-cols-2 gap-4">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+                
+                <div class="mt-6">
+                    <h4 id="timer" class="timer-display text-lg"></h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white py-4 text-center text-gray-600 text-sm border-t border-gray-300">
+        <div class="max-w-6xl mx-auto px-4">
+            <p>© 2025 Ministry of Education - EduAssess Platform</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

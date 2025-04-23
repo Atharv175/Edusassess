@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAssess - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="/static/tailwind.css" rel="stylesheet">
+    <script src="static/script.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #eef1ff;
+            --secondary: #5e60ce;
+            --success: #48c78e;
+            --warning: #ff9f43;
+            --info: #64b5f6;
+            --purple: #9381ff;
+            --pink: #ff76a6;
+            --teal: #4cc9bd;
+            --orange: #ff7849;
+            --bg: #f0f4f9;
+            --card-bg: #ffffff;
+            --dark-bg: #2a2d3e;
+            --border: #e0e5ec;
+            --text: #333333;
+            --text-light: #777777;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Different colors for each card */
+        .card-create .card-icon {
+            background-color: var(--primary);
+        }
+
+        .card-add .card-icon {
+            background-color: var(--success);
+        }
+
+        .card-existing .card-icon {
+            background-color: var(--info);
+        }
+
+        .card-compare .card-icon {
+            background-color: var(--warning);
+        }
+
+        .card-ai .card-icon {
+            background-color: var(--purple);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+            padding-right: 45px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-create {
+            background-color: var(--primary);
+        }
+
+        .btn-create:hover {
+            background-color: #3651d4;
+        }
+
+        .btn-add {
+            background-color: var(--success);
+        }
+
+        .btn-add:hover {
+            background-color: #3cb179;
+        }
+
+        .btn-show {
+            background-color: var(--info);
+        }
+
+        .btn-show:hover {
+            background-color: #4a9fe0;
+        }
+
+        .btn-compare {
+            background-color: var(--warning);
+        }
+        
+        .btn-compare:hover {
+            background-color: #f08c2a;
+        }
+
+        .btn-generate {
+            background-color: var(--purple);
+        }
+
+        .btn-generate:hover {
+            background-color: #8270e9;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            font-size: 100px;
+            opacity: 0;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 15px;
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Results display styling */
+        .results-container {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .results-title {
+            color: var(--info);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .results-stat {
+            margin: 8px 0;
+        }
+
+        .pre-rate {
+            color: var(--warning);
+        }
+
+        .post-rate {
+            color: var(--success);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .card {
+                padding: 15px;
+            }
+            
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+        </div>
+
+        <!-- Create Quiz Section -->
+        <div class="card card-create">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h2 class="card-title">Create a New Quiz</h2>
+            </div>
+            <div class="form-group">
+                <input type="text" id="quizTitle" placeholder="Enter Quiz Title" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" id="quizCategory" placeholder="Enter Quiz Category" class="form-control">
+            </div>
+            <button onclick="createQuiz()" class="btn btn-create">
+                <i class="fas fa-plus-circle"></i> Create Quiz
+            </button>
+        </div>
+
+        <!-- Add Questions Section -->
+        <div class="card card-add">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-list-check"></i>
+                </div>
+                <h2 class="card-title">Add Questions to Quiz</h2>
+            </div>
+            <div class="form-group">
+                <select id="quizList" class="form-control form-select">
+                    <option value="">Select a Quiz</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Select Class:</label>
+                <select id="classSelect" class="form-control form-select">
+                    <option value="">Select Class</option>
+                    <option value="1">Class 1</option>
+                    <option value="2">Class 2</option>
+                    <option value="3">Class 3</option>
+                    <option value="4">Class 4</option>
+                    <option value="5">Class 5</option>
+                    <option value="6">Class 6</option>
+                    <option value="7">Class 7</option>
+                    <option value="8">Class 8</option>
+                    <option value="9">Class 9</option>
+                    <option value="10">Class 10</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Select Subject:</label>
+                <select id="subjectSelect" class="form-control form-select">
+                    <option value="">Select Subject</option>
+                    <option value="Math">Mathematics</option>
+                    <option value="Science">Science</option>
+                    <option value="English">English</option>
+                    <option value="Social Science">Social Science</option>
+                    <option value="Hindi">Hindi</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Select Book:</label>
+                <select id="bookSelect" class="form-control form-select">
+                    <option value="">Select Book</option>
+                </select>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="form-label">Select Chapter:</label>
+                <select id="chapterSelect" class="form-control form-select">
+                    <option value="">Select Chapter</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" id="questionText" placeholder="Enter Question" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" id="option1" placeholder="Option 1" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" id="option2" placeholder="Option 2" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" id="option3" placeholder="Option 3" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" id="option4" placeholder="Option 4" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="text" id="correctAnswer" placeholder="Correct Answer" class="form-control">
+            </div>
+            <button onclick="addQuestion()" class="btn btn-add">
+                <i class="fas fa-plus"></i> Add Question
+            </button>
+        </div>
+
+    <!-- Create Quiz from Existing Questions -->
+<div class="card card-existing">
+    <div class="card-header">
+        <div class="card-icon">
+            <i class="fas fa-copy"></i>
+        </div>
+        <h2 class="card-title">Create Quiz from Existing Questions</h2>
+    </div>
+
+    <!-- Select Class -->
+    <div class="form-group">
+        <label class="form-label">Select Class:</label>
+        <select id="filterClass" class="form-control form-select" onchange="fetchBooks()">
+            <option value="">Select Class</option>
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+        </select>
+    </div>
+
+    <!-- Select Subject -->
+    <div class="form-group">
+        <label class="form-label">Select Subject:</label>
+        <select id="filterSubject" class="form-control form-select" onchange="fetchBooks()">
+            <option value="">Select Subject</option>
+            <option value="Math">Mathematics</option>
+            <option value="Science">Science</option>
+            <option value="English">English</option>
+            <option value="Social Science">Social Science</option>
+            <option value="Hindi">Hindi</option>
+        </select>
+    </div>
+
+    <!-- Select Book (Will Be Populated Dynamically) -->
+    <!-- Select Book -->
+<div class="form-group">
+    <label class="form-label">Select Book:</label>
+    <select id="filterBook" class="form-control form-select" onchange="fetchChapters()">
+        <option value="">Select Book</option>
+    </select>
+</div>
+
+<!-- Select Chapter -->
+<div class="form-group">
+    <label class="form-label">Select Chapter:</label>
+    <select id="filterChapter" class="form-control form-select">
+        <option value="">Select Chapter</option>
+    </select>
+</div>
+
+
+
+
+
+    <!-- 🔍 Show Questions Button -->
+<button onclick="fetchFilteredQuestions()" class="btn btn-show" style="margin-bottom: 15px;">
+    <i class="fas fa-search"></i> Show Questions
+</button>
+
+<!-- 📝 Filtered Questions Display -->
+<div id="questionsContainer" class="mt-4 space-y-3 hidden">
+    <h3 class="text-lg font-semibold text-gray-700">Filtered Questions</h3>
+
+    <!-- 📜 Question List (Dynamically Populated) -->
+    <div id="questionsList"></div>
+
+    <!-- 🔄 Pagination Controls -->
+    <div class="mt-4 flex justify-between items-center">
+        <button id="prevPage" class="btn btn-show hidden" onclick="changePage(-1)">
+            ⬅️ Previous
+        </button>
+        <span id="pageNumber" class="text-gray-600">Page 1</span>
+        <button id="nextPage" class="btn btn-show hidden" onclick="changePage(1)">
+            Next ➡️
+        </button>
+    </div>
+</div>
+
+<!-- ✅ Create Quiz Button -->
+<button onclick="submitQuiz()" class="btn btn-create" id="submitQuizBtn" disabled>
+    <i class="fas fa-check"></i> Create Quiz
+</button>
+
+</div>
+
+
+
+
+
+
+<!-- 📌 Button to Open Pre/Post Quiz Generator -->
+<button onclick="togglePrePostForm()" class="btn btn-generate">
+    <i class="fas fa-random"></i> Generate Pre & Post Assessment Quiz
+</button>
+
+<!-- 📌 Hidden Pre/Post Quiz Form -->
+<div id="prePostQuizForm" class="hidden mt-6 p-6 bg-white rounded-lg shadow-lg border">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Generate Pre & Post Assessment Quiz</h3>
+
+    <!-- Class Selection -->
+    <div class="form-group">
+        <label class="form-label">Select Class:</label>
+        <select id="prePostClass" class="form-control form-select">
+            <option value="">Select Class</option>
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+        </select>
+    </div>
+
+    <!-- Subject Selection -->
+    <div class="form-group">
+        <label class="form-label">Select Subject:</label>
+        <select id="prePostSubject" class="form-control form-select">
+            <option value="">Select Subject</option>
+            <option value="Math">Mathematics</option>
+            <option value="Science">Science</option>
+            <option value="English">English</option>
+            <option value="Social Science">Social Science</option>
+            <option value="Hindi">Hindi</option>
+        </select>
+    </div>
+
+    <!-- Book Selection -->
+<div class="form-group">
+    <label class="form-label">Select Book:</label>
+    <select id="prePostBook" class="form-control form-select">
+        <option value="">Select Book</option>
+    </select>
+</div>
+
+<!-- Debug Button (Remove Later) -->
+<button onclick="debugFetchBooks()" class="btn btn-warning">🔍 Debug Fetch Books</button>
+
+
+    
+
+
+<!-- Chapter Selection -->
+<div class="form-group">
+    <label class="form-label">Select Chapter:</label>
+    <select id="prePostChapter" class="form-control form-select">
+        <option value="">Select Chapter</option>
+    </select>
+</div>
+<button onclick="fetchChaptersForPrePost()" class="btn btn-debug">
+    🔄 Debug Fetch Chapters
+</button>
+
+
+    <!-- Submit Button -->
+    <button onclick="generatePrePostQuiz()" class="btn btn-generate">
+        <i class="fas fa-magic"></i> Generate Quizzes
+    </button>
+
+    <!-- Close Form Button -->
+    <button onclick="togglePrePostForm()" class="btn btn-secondary mt-4">
+        ❌ Cancel
+    </button>
+
+    <!-- Success Message -->
+    <p id="quizGenerationMessage" class="hidden text-green-500 font-semibold mt-4"></p>
+</div>
+
+
+<!-- Section to Display Quiz Questions -->
+<div id="quizQuestionsContainer" class="hidden mt-6 p-6 bg-white rounded-lg shadow-lg border">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Quiz Questions</h3>
+
+    <div class="form-group">
+        <label class="form-label">Select Quiz:</label>
+        <select id="quizSelect" class="form-control form-select">
+            <option value="">Select Quiz</option>
+            <!-- Pre & Post Quiz IDs Will Be Populated Here -->
+        </select>
+    </div>
+
+    <button onclick="fetchQuizQuestions()" class="btn btn-fetch mt-2">
+        🔍 Show Questions
+    </button>
+    
+
+    <div id="quizQuestionsList" class="mt-4 space-y-3">
+        <!-- Questions will be populated here -->
+    </div>
+</div>
+
+
+
+
+
+
+
+
+        <!-- Compare Training Effectiveness Section -->
+        <div class="card card-compare">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2 class="card-title">Compare Training Effectiveness</h2>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter Pre-Training Game PIN:</label>
+                <input type="text" id="preTrainingPin" placeholder="Enter Pre-Training Game PIN" class="form-control">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter Post-Training Game PIN:</label>
+                <input type="text" id="postTrainingPin" placeholder="Enter Post-Training Game PIN" class="form-control">
+            </div>
+            <button onclick="compareQuizzes()" class="btn btn-compare">
+                <i class="fas fa-chart-bar"></i> Compare Performance
+            </button>
+
+            <!-- Result Display Box -->
+            <div id="comparisonResults" class="hidden results-container">
+                <h3 class="results-title">Training Improvement Summary</h3>
+                <p class="results-stat">Pre-Training Success Rate: <span id="preSuccessRate" class="pre-rate font-bold"></span>%</p>
+                <p class="results-stat">Post-Training Success Rate: <span id="postSuccessRate" class="post-rate font-bold"></span>%</p>
+                <p class="mt-2 font-semibold" id="improvementMessage"></p>
+            </div>
+        </div>
+
+        <!-- AI-Powered Question Generation -->
+        <div class="card card-ai">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h2 class="card-title">AI-Powered Question Generator</h2>
+            </div>
+            <div class="form-group">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="file-input">
+                    <label for="fileInput" class="file-input-label">
+                        <i class="fas fa-upload"></i> Choose File
+                    </label>
+                </div>
+            </div>
+            <button onclick="uploadAndGenerateQuestions()" class="btn btn-generate">
+                <i class="fas fa-magic"></i> Generate Questions
+            </button>
+
+            <!-- AI Generated Questions Display -->
+            <div id="aiQuestionsContainer" class="mt-6 hidden">
+                <h3 class="text-lg font-semibold text-green-300">AI-Generated Questions</h3>
+                <ul id="aiQuestionsList" class="mt-4 space-y-3"></ul>
+                
+                <button onclick="addAIQuestionsToQuiz()" class="btn btn-add mt-4">
+                    <i class="fas fa-plus"></i> Add to Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <canvas id="successRateChart"></canvas>
+
+    <script>
+    // File input label update
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('fileInput');
+        const fileLabel = document.querySelector('.file-input-label');
+        
+        if (fileInput && fileLabel) {
+            fileInput.addEventListener('change', function() {
+                if (fileInput.files.length > 0) {
+                    fileLabel.innerHTML = '<i class="fas fa-file"></i> ' + fileInput.files[0].name;
+                } else {
+                    fileLabel.innerHTML = '<i class="fas fa-upload"></i> Choose File';
+                }
+            });
+        }
+    });
+
+    function compareQuizzes() {
+        let prePin = document.getElementById("preTrainingPin").value;
+        let postPin = document.getElementById("postTrainingPin").value;
+    
+        if (!prePin || !postPin) {
+            alert("⚠️ Please enter both Game PINs for comparison!");
+            return;
+        }
+    
+        fetch(`/compare_training?pre_pin=${prePin}&post_pin=${postPin}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update UI with the fetched success rates
+                document.getElementById("preSuccessRate").textContent = data.success_rate.pre.toFixed(2);
+                document.getElementById("postSuccessRate").textContent = data.success_rate.post.toFixed(2);
+    
+                // Improvement Message
+                let improvement = data.success_rate.post - data.success_rate.pre;
+                let message = improvement > 0 
+                    ? `Improvement of ${improvement.toFixed(2)}%! Great progress!` 
+                    : `No improvement detected. Consider revising training materials.`;
+                
+                document.getElementById("improvementMessage").textContent = message;
+    
+                // Show Results Box
+                document.getElementById("comparisonResults").classList.remove("hidden");
+    
+            } else {
+                alert("Error: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error fetching training data:", error));
+    }
+    </script>
+</body>
+</html>

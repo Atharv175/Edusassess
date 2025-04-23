@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAssess - Host Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-image: url('https://img.freepik.com/free-vector/school-classroom-interior-university-educational-concept-blackboard-table_1441-1694.jpg'); /* Replace with your actual classroom background image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        
+        /* Main content wrapper with semi-transparent background */
+        .content-wrapper {
+            background-color: rgba(255, 255, 255, 0.65); /* Reduced from 0.85 to 0.65 */
+            backdrop-filter: blur(3px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .gradient-card {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.7), rgba(247, 249, 252, 0.7)); /* Reduced from 0.9 to 0.7 */
+            backdrop-filter: blur(3px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .gradient-card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        .bg-purple-50, .bg-amber-50, .bg-rose-50 {
+            background-opacity: 0.6; /* Reduced opacity */
+        }
+
+        .background-image {
+            opacity: 0.8; /* Increase from default if you're using a separate element */
+        }
+        
+        .dashboard-sidebar {
+            background-color: rgba(10, 32, 87, 0.95); /* Dark blue with transparency */
+            backdrop-filter: blur(8px);
+            color: #a3b3d9; /* Light blue-gray for text */
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-header {
+            color: #8fa3c5; /* Lighter blue-gray for the header */
+        }
+        
+        .sidebar-item {
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-item:hover:not(.active) {
+            background-color: rgba(13, 42, 107, 0.7); /* Slightly lighter blue on hover with transparency */
+            border-left: 4px solid #2a4175; /* Border color on hover */
+        }
+        
+        .sidebar-item.active {
+            background-color: rgba(26, 55, 124, 0.8); /* Highlight blue for active item with transparency */
+            border-left: 4px solid #5271b8; /* Brighter blue border for active item */
+            color: #ffffff; /* White text for active item */
+            font-weight: 600;
+        }
+        
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 1rem;
+            border-top: 1px solid rgba(26, 55, 124, 0.5);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Game pin styling */
+        .game-pin-display {
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 10px 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        
+        .pin-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 2px;
+        }
+        
+        /* Waiting for players message */
+        .waiting-message {
+            background-color: rgba(102, 51, 153, 0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Audio Button Styling */
+        .audio-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: rgba(79, 70, 229, 0.9);
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .audio-button:hover {
+            transform: scale(1.1);
+            background-color: rgba(67, 56, 202, 0.95);
+        }
+        
+        .audio-button svg {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    <!-- Background Music Audio Element -->
+    <audio id="backgroundMusic" loop>
+        <source src="educational-corporate-music-311699.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Audio Control Button -->
+    <button id="audioControl" class="audio-button" title="Toggle Music">
+        <svg xmlns="http://www.w3.org/2000/svg" class="audio-icon-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+        </svg>
+    </button>
+
+    <div class="flex min-h-screen">
+        <!-- Left Sidebar - Dark Blue -->
+        <div class="w-64 dashboard-sidebar flex flex-col min-h-screen relative">
+            <div class="p-4 border-b border-opacity-20 border-blue-400">
+                <h1 class="text-2xl font-bold dashboard-header">EduAssess</h1>
+            </div>
+            
+            <!-- Game Pin Display -->
+            <div class="mx-4 my-4">
+                <div class="game-pin-display text-center">
+                    <h3 class="text-sm font-semibold text-gray-500">GAME PIN</h3>
+                    <p id="gamePin" class="pin-number text-amber-500">--- ---</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Items -->
+            <nav class="flex-1 pt-4">
+                <button onclick="showTab('start-quiz')" class="sidebar-item active w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span>🚀</span>
+                    <span>Start Assesment</span>
+                </button>
+                <button onclick="showTab('leaderboard')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span>🏆</span>
+                    <span>Leaderboard</span>
+                </button>
+                <button onclick="showTab('performance')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span>📈</span>
+                    <span>Performance</span>
+                </button>
+                <button onclick="showTab('incorrect')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span>❌</span>
+                    <span>Incorrect</span>
+                </button>
+                <button onclick="showTab('analysis')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span>📊</span>
+                    <span>Analysis</span>
+                </button>
+            </nav>
+            
+            <!-- Logout Button at Bottom -->
+            <div class="sidebar-bottom">
+                <button class="w-full text-left px-6 py-3 flex items-center space-x-3 hover:text-white">
+                    <span>↩️</span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 content-wrapper p-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Host Dashboard</h2>
+                
+            </div>
+
+            <!-- Start Quiz Section -->
+            <div id="start-quiz" class="tab-content active">
+                <div class="p-6 gradient-card rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-indigo-600">🚀 Start Assessment</h3>
+                    
+                    <label class="block text-lg mt-2">Select a Quiz:</label>
+                    <!-- 🏆 Quiz Dropdown -->
+                    <select id="quizList" class="w-full p-3 bg-white bg-opacity-80 text-gray-700 border border-gray-300 rounded-md mt-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Loading...</option>
+                    </select>
+
+                    <button onclick="loadQuizzes()" class="btn btn-refresh bg-blue-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-600 transition duration-300">
+                        🔄 Refresh Quizzes
+                    </button>
+
+                    <button onclick="startQuiz()"
+        class="w-full mt-4 p-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md transition duration-300">
+        🎤 Start Quiz
+    </button>
+
+    <!-- Add this HTML to the start-quiz section after the startQuiz button -->
+<div id="waitingParticipantsSection" class="mt-6 hidden">
+    <h3 class="text-lg font-semibold text-green-600 mb-2">👨‍👩‍👧‍👦 Waiting Participants</h3>
+    <div class="bg-white bg-opacity-60 rounded-md p-3">
+        <table class="w-full border-collapse">
+            <thead>
+                <tr class="bg-green-50">
+                    <th class="border border-green-200 p-2 text-green-700">Name</th>
+                    <th class="border border-green-200 p-2 text-green-700">District</th>
+                    <th class="border border-green-200 p-2 text-green-700">Join Time</th>
+                </tr>
+            </thead>
+            <tbody id="waitingParticipantsTable">
+                <tr>
+                    <td colspan="3" class="text-center p-3">No participants waiting yet</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="waiting-message mt-4 text-center bg-indigo-100 p-3 rounded-md">
+        <p class="text-indigo-700">Participants are joining and waiting for you to start the quiz</p>
+    </div>
+
+    <button onclick="startQuizForAll()" 
+        class="w-full mt-4 p-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md transition duration-300">
+        🚀 Start Quiz for All Participants
+    </button>
+</div>
+
+<div id="hostQuizContainer" class="mt-6 hidden">
+    <h3 class="text-xl font-semibold text-indigo-600 mb-4">📝 Current Question</h3>
+    
+    <div class="p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
+        <h4 id="hostQuestionText" class="text-lg font-bold text-gray-800 mb-4">Question text will appear here</h4>
+        
+        <div id="hostOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- Options will be dynamically inserted here -->
+        </div>
+        
+        <div class="mt-6 flex justify-between items-center">
+            <div class="text-lg font-semibold text-red-500" id="hostTimer">Time Left: --s</div>
+            <div class="text-lg font-semibold">Question <span id="currentQuestionNumber">0</span> of <span id="totalQuestions">0</span></div>
+        </div>
+    </div>
+    
+    <div class="flex justify-end mt-4">
+        <button onclick="moveToNextQuestion()" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md transition duration-300">
+            Next Question →
+        </button>
+    </div>
+</div>
+
+
+
+
+                    
+                </div>
+            </div>
+            
+
+
+
+
+
+
+
+
+
+            <!-- Leaderboard Section -->
+            <div id="leaderboard" class="tab-content">
+                <div class="p-6 gradient-card rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-amber-500">🏆 Live Leaderboard</h3>
+                    <table class="w-full mt-4 border-collapse bg-white bg-opacity-60">
+                        <thead>
+                            <tr class="bg-amber-50 bg-opacity-80">
+                                <th class="border border-amber-200 p-3 text-amber-700">Rank</th>
+                                <th class="border border-amber-200 p-3 text-amber-700">Participant</th>
+                                <th class="border border-amber-200 p-3 text-amber-700">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTable"></tbody>
+                    </table>
+
+                    <button onclick="fetchLeaderboard()"
+                        class="w-full mt-4 p-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-md transition duration-300">
+                        🔄 Refresh Leaderboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Performance Analysis -->
+
+            <!-- Performance Analysis -->
+<div id="performance" class="tab-content">
+    <div class="p-6 gradient-card rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-blue-600">📈 Performance Analysis</h3>
+        
+        <!-- Performance Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+            <div class="p-4 bg-blue-50 rounded-lg shadow-sm">
+                <p class="text-sm font-medium text-blue-800">Total Participants</p>
+                <p class="text-xl font-bold text-blue-600 mt-1" id="totalParticipants">-</p>
+            </div>
+            <div class="p-4 bg-green-50 rounded-lg shadow-sm">
+                <p class="text-sm font-medium text-green-800">Average Score</p>
+                <p class="text-xl font-bold text-green-600 mt-1" id="avgScore">-</p>
+            </div>
+            <div class="p-4 bg-purple-50 rounded-lg shadow-sm">
+                <p class="text-sm font-medium text-purple-800">Accuracy Rate</p>
+                <p class="text-xl font-bold text-purple-600 mt-1" id="accuracyRate">-</p>
+            </div>
+            <div class="p-4 bg-amber-50 rounded-lg shadow-sm">
+                <p class="text-sm font-medium text-amber-800">Top Score</p>
+                <p class="text-xl font-bold text-amber-600 mt-1" id="topScore">-</p>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Score Distribution Chart -->
+            <div class="bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-medium text-gray-700 mb-2">Score Distribution</h4>
+                <canvas id="scoreChart" height="220"></canvas>
+            </div>
+
+            <!-- Correct vs Incorrect Analysis -->
+            <div class="bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
+                <h4 class="text-lg font-medium text-gray-700 mb-2">Correct vs Incorrect</h4>
+                <canvas id="accuracyChart" height="220"></canvas>
+            </div>
+        </div>
+        
+        <!-- Performance Trends -->
+        <div class="mt-6 bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">Performance Distribution</h4>
+            <canvas id="performanceDistribution" height="180"></canvas>
+        </div>
+        
+        <!-- Score Percentiles -->
+        <div class="mt-6 bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
+            <h4 class="text-lg font-medium text-gray-700 mb-2">Score Percentiles</h4>
+            <div class="relative pt-1">
+                <div class="flex mb-2 items-center justify-between">
+                    <div>
+                        <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
+                            Score Range
+                        </span>
+                    </div>
+                    <div class="text-right">
+                        <span id="percentileInfo" class="text-xs font-semibold inline-block text-blue-600">
+                            -
+                        </span>
+                    </div>
+                </div>
+                <div class="overflow-hidden h-6 mb-4 text-xs flex rounded bg-gray-200">
+                    <div id="p25" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500" style="width: 25%">
+                        25%
+                    </div>
+                    <div id="p50" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-500" style="width: 25%">
+                        50%
+                    </div>
+                    <div id="p75" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500" style="width: 25%">
+                        75%
+                    </div>
+                    <div id="p100" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500" style="width: 25%">
+                        100%
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-4 gap-2 text-center text-sm">
+                <div>0-25th <span id="p25Value" class="font-semibold">-</span></div>
+                <div>25-50th <span id="p50Value" class="font-semibold">-</span></div>
+                <div>50-75th <span id="p75Value" class="font-semibold">-</span></div>
+                <div>75-100th <span id="p100Value" class="font-semibold">-</span></div>
+            </div>
+        </div>
+
+        <button onclick="fetchPerformanceAnalysis()" 
+        class="w-full mt-4 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition duration-300">
+        📊 Generate Analysis
+    </button>
+</div>
+</div>
+
+
+            
+
+            <!-- Most Incorrect Questions -->
+            <div id="incorrect" class="tab-content">
+                <div class="p-6 gradient-card rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-rose-500">❌ Most Incorrect Questions</h3>
+                    <table class="w-full mt-4 border-collapse bg-white bg-opacity-60">
+                        <thead>
+                            <tr class="bg-rose-50 bg-opacity-80">
+                                <th class="border border-rose-200 p-3 text-rose-700">Question</th>
+                                <th class="border border-rose-200 p-3 text-rose-700">Correct Answer</th>
+                                <th class="border border-rose-200 p-3 text-rose-700">Incorrect %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incorrectQuestionsTable"></tbody>
+                    </table>
+
+                    <button onclick="fetchIncorrectQuestions()" 
+                        class="w-full mt-4 p-3 bg-rose-500 hover:bg-rose-600 text-white font-semibold rounded-md transition duration-300">
+                        📊 Show Incorrect Questions
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overall Quiz Analysis -->
+            <div id="analysis" class="tab-content">
+                <div class="p-6 gradient-card rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-purple-600">📊 Overall Quiz Analysis</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                        <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
+                            <p class="text-lg font-medium text-center text-purple-800">Success Rate</p>
+                            <p class="text-xl font-bold text-center text-purple-600 mt-2" id="successRate">-</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
+                            <p class="text-lg font-medium text-center text-purple-800">Average Score</p>
+                            <p class="text-xl font-bold text-center text-purple-600 mt-2" id="averageScore">-</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
+                            <p class="text-lg font-medium text-center text-purple-800">Difficulty Level</p>
+                            <p class="text-xl font-bold text-center text-purple-600 mt-2" id="difficultyLevel">-</p>
+                        </div>
+                    </div>
+
+                    <button onclick="fetchQuizAnalysis()" 
+                        class="w-full mt-4 p-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-md transition duration-300">
+                        📊 Show Quiz Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/script.js"></script>
+    
+    <!-- Tab Functionality Script -->
+    <script>
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked sidebar item
+            event.currentTarget.classList.add('active');
+        }
+
+        // Background Music Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const audioControl = document.getElementById('audioControl');
+            const audioIconMuted = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <line x1="23" y1="9" x2="17" y2="15"></line>
+                <line x1="17" y1="9" x2="23" y2="15"></line>
+            </svg>`;
+            const audioIconPlaying = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+            </svg>`;
+            
+            let isMuted = true;
+            
+            // Start playing music on page load (but muted initially to comply with autoplay policies)
+            backgroundMusic.volume = 0;
+            backgroundMusic.muted = true;
+            
+            // Try to start playing (may be blocked by browser autoplay policy)
+            try {
+                backgroundMusic.play().catch(error => {
+                    console.log("Autoplay prevented: " + error);
+                });
+            } catch (error) {
+                console.log("Error starting audio: " + error);
+            }
+            
+            // Toggle music on button click
+            audioControl.addEventListener('click', function() {
+                if (isMuted) {
+                    // Unmute and play
+                    backgroundMusic.muted = false;
+                    backgroundMusic.volume = 0.1; // Set to 30% volume
+                    backgroundMusic.play();
+                    audioControl.innerHTML = audioIconPlaying;
+                    audioControl.title = "Mute Music";
+                } else {
+                    // Mute but don't stop (keeps playback position)
+                    backgroundMusic.muted = true;
+                    backgroundMusic.volume = 0;
+                    audioControl.innerHTML = audioIconMuted;
+                    audioControl.title = "Unmute Music";
+                }
+                isMuted = !isMuted;
+            });
+        });
+    </script>
+</body>
+</html>
