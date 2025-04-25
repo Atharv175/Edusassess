@@ -203,7 +203,7 @@
                 </button>
                 <button onclick="showTab('incorrect')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
                     <span>❌</span>
-                    <span>Incorrect</span>
+                    <span>Weak Topics</span>
                 </button>
                 <button onclick="showTab('analysis')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
                     <span>📊</span>
@@ -231,114 +231,134 @@
         <!-- Restructured Start Quiz Section -->
 
         <!-- Start Quiz Section -->
-<div id="start-quiz" class="tab-content active">
-    <div class="p-6 gradient-card rounded-lg shadow-md">
-        <h3 class="text-xl font-semibold text-indigo-600">🚀 Start Assessment</h3>
+        <div id="start-quiz" class="tab-content active">
+            <div class="p-6 gradient-card rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold text-indigo-600">🚀 Start Assessment</h3>
+                
+                <!-- Step 1: Quiz Selection - Initially visible -->
+                <!-- Step 1: Quiz Selection - Initially visible -->
+<div id="quizSelectionSection" class="quiz-step active">
+    <label class="block text-lg mt-2">Select a Quiz:</label>
+    <!-- 🏆 Quiz Dropdown -->
+    <select id="quizList" class="w-full p-3 bg-white bg-opacity-80 text-gray-700 border border-gray-300 rounded-md mt-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">Loading...</option>
+    </select>
+
+    <!-- 📢 Message to guide user -->
+    <p class="text-sm text-gray-600 mt-2 mb-1 italic">
+        👉 Click on the "Refresh Quizzes" button to load available quizzes.
+    </p>
+
+    <button onclick="loadQuizzes()" class="btn btn-refresh bg-blue-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-600 transition duration-300">
+        🔄 Refresh Quizzes
+    </button>
+
+    <button onclick="startQuiz()" class="w-full mt-4 p-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md transition duration-300">
+        🎤 Start Quiz
+    </button>
+</div>
+
         
-        <!-- Step 1: Quiz Selection - Initially visible -->
-        <div id="quizSelectionSection" class="quiz-step active">
-            <label class="block text-lg mt-2">Select a Quiz:</label>
-            <!-- 🏆 Quiz Dropdown -->
-            <select id="quizList" class="w-full p-3 bg-white bg-opacity-80 text-gray-700 border border-gray-300 rounded-md mt-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="">Loading...</option>
-            </select>
-
-            <button onclick="loadQuizzes()" class="btn btn-refresh bg-blue-500 text-white px-4 py-2 rounded-md mt-2 hover:bg-blue-600 transition duration-300">
-                🔄 Refresh Quizzes
-            </button>
-
-            <button onclick="startQuiz()" class="w-full mt-4 p-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md transition duration-300">
-                🎤 Start Quiz
-            </button>
-        </div>
-
-        <!-- Step 2: Waiting Participants - Initially hidden -->
-        <div id="waitingParticipantsSection" class="quiz-step hidden">
-            <h3 class="text-lg font-semibold text-green-600 mb-2">👨‍👩‍👧‍👦 Waiting Participants</h3>
-            <div class="bg-white bg-opacity-60 rounded-md p-3">
-                <table class="w-full border-collapse">
-                    <thead>
-                        <tr class="bg-green-50">
-                            <th class="border border-green-200 p-2 text-green-700">Name</th>
-                            <th class="border border-green-200 p-2 text-green-700">District</th>
-                            <th class="border border-green-200 p-2 text-green-700">Join Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="waitingParticipantsTable">
-                        <tr>
-                            <td colspan="3" class="text-center p-3">No participants waiting yet</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="waiting-message mt-4 text-center bg-indigo-100 p-3 rounded-md">
-                <p class="text-indigo-700">Participants are joining and waiting for you to start the quiz</p>
-            </div>
-
-            <button onclick="startQuizForAll()" 
-                class="w-full mt-4 p-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md transition duration-300">
-                🚀 Start Quiz for All Participants
-            </button>
-        </div>
-
-        <!-- Step 3: Host Quiz Interface - Initially hidden -->
-        <div id="hostQuizContainer" class="quiz-step hidden">
-            <h3 class="text-xl font-semibold text-indigo-600 mb-4">📝 Current Question</h3>
-            
-            <div class="p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
-                <h4 id="hostQuestionText" class="text-lg font-bold text-gray-800 mb-4">Question text will appear here</h4>
-                
-                <div id="hostOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <!-- Options will be dynamically inserted here -->
-                </div>
-                
-                <div class="mt-6 flex justify-between items-center">
-                    <div class="text-lg font-semibold text-red-500" id="hostTimer">Time Left: --s</div>
-                    <div class="text-lg font-semibold">Question <span id="currentQuestionNumber">0</span> of <span id="totalQuestions">0</span></div>
-                </div>
-            </div>
-            
-            <!-- Question Results Section (initially hidden) -->
-            <div id="questionResultsSection" class="mt-6 hidden">
-                <h3 class="text-lg font-semibold text-green-600 mb-2">📊 Response Results</h3>
-                <div class="p-4 bg-white bg-opacity-90 rounded-lg shadow-md">
-                    <div class="mb-4" style="max-height: 250px; max-width: 500px; margin: 0 auto;">
-                        <h4 class="text-center font-medium text-gray-700">Response Distribution</h4>
-                        <canvas id="responseChart" height="150"></canvas>
+                <!-- Step 2: Waiting Participants - Initially hidden -->
+                <div id="waitingParticipantsSection" class="quiz-step hidden">
+                    <h3 class="text-lg font-semibold text-green-600 mb-2">👨‍👩‍👧‍👦 Waiting Participants</h3>
+                    <div class="bg-white bg-opacity-60 rounded-md p-3">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-green-50">
+                                    <th class="border border-green-200 p-2 text-green-700">Name</th>
+                                    <th class="border border-green-200 p-2 text-green-700">District</th>
+                                    <th class="border border-green-200 p-2 text-green-700">Join Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waitingParticipantsTable">
+                                <tr>
+                                    <td colspan="3" class="text-center p-3">No participants waiting yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div id="correctAnswerDisplay" class="text-center p-2 bg-green-100 rounded-md mt-4">
-                        <span class="font-semibold text-green-700">Correct Answer: </span>
-                        <span id="correctAnswerText">-</span>
+        
+                    <div class="waiting-message mt-4 text-center bg-indigo-100 p-3 rounded-md">
+                        <p class="text-indigo-700">Participants are joining and waiting for you to start the quiz</p>
                     </div>
+        
+                    <button onclick="startQuizForAll()" 
+                        class="w-full mt-4 p-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-md transition duration-300">
+                        🚀 Start Quiz for All Participants
+                    </button>
                 </div>
-            </div>
-            
-            <div class="flex justify-end mt-4">
-                <button onclick="moveToNextQuestion()" id="nextQuestionBtn" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md transition duration-300">
-                    Next Question →
-                </button>
-            </div>
-        </div>
-
-        <!-- Step 4: Live Responses (shown alongside hostQuizContainer) -->
-        <div id="responsesContainer" class="quiz-step hidden mt-6">
-            <h3 class="text-lg font-semibold text-blue-600 mb-2"></h3>
-            <div class="bg-white bg-opacity-60 rounded-md p-3">
-                <table class="w-full border-collapse">
-                    <thead>
+        
+                <!-- Step 3: Host Quiz Interface - Initially hidden -->
+                <div id="hostQuizContainer" class="quiz-step hidden">
+                    <h3 class="text-xl font-semibold text-indigo-600 mb-4">📝 Current Question</h3>
+                    
+                    <div class="p-6 bg-white bg-opacity-90 rounded-lg shadow-md">
+                        <h4 id="hostQuestionText" class="text-lg font-bold text-gray-800 mb-4">Question text will appear here</h4>
                         
-                    </thead>
-                    <tbody id="responseTable">
-                        <tr>
-                            <td colspan="4" class="text-center p-3"></td>
-                        </tr>
-                    </tbody>
-                </table>
+                        <div id="hostOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <!-- Options will be dynamically inserted here -->
+                        </div>
+                        
+                        <div class="mt-6 flex justify-between items-center">
+                            <div class="text-lg font-semibold text-red-500" id="hostTimer">Time Left: --s</div>
+                            <div class="text-lg font-semibold">Question <span id="currentQuestionNumber">0</span> of <span id="totalQuestions">0</span></div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mt-4">
+                        <button onclick="moveToNextQuestion()" id="nextQuestionBtn" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md transition duration-300">
+                            Next Question →
+                        </button>
+                    </div>
+                    
+                    
+                    <!-- Question Results Section (initially hidden) -->
+                   <!-- Modal-style Response Results -->
+<div id="questionResultsSection" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-xl relative shadow-lg  transition-opacity duration-300 ease-in-out">
+        <!-- Close button -->
+        <button onclick="closeResultsModal()" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl font-bold">&times;</button>
+
+        <h3 class="text-lg font-semibold text-green-600 mb-2">📊 Response Results</h3>
+        <div class="p-4 bg-white bg-opacity-90 rounded-lg shadow-md">
+            <div class="mb-4" style="max-height: 250px; max-width: 500px; margin: 0 auto;">
+                <h4 class="text-center font-medium text-gray-700">Response Distribution</h4>
+                <canvas id="responseChart" height="150"></canvas>
+            </div>
+            <div id="correctAnswerDisplay" class="text-center p-2 bg-green-100 rounded-md mt-4">
+                <span class="font-semibold text-green-700">Correct Answer: </span>
+                <span id="correctAnswerText">-</span>
             </div>
         </div>
     </div>
 </div>
+
+                    
+                    
+                </div>
+        
+                <!-- Step 4: Live Responses (shown alongside hostQuizContainer) -->
+                <div id="responsesContainer" class="quiz-step hidden mt-6">
+                    <h3 class="text-lg font-semibold text-blue-600 mb-2"></h3>
+                    <div class="bg-white bg-opacity-60 rounded-md p-3">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                
+                            </thead>
+                            <tbody id="responseTable">
+                                <tr>
+                                    <td colspan="4" class="text-center p-3"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
 
 
 
@@ -346,34 +366,55 @@
 
 
             <!-- Leaderboard Section -->
-            <div id="leaderboard" class="tab-content">
-                <div class="p-6 gradient-card rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-amber-500">🏆 Live Leaderboard</h3>
-                    <table class="w-full mt-4 border-collapse bg-white bg-opacity-60">
-                        <thead>
-                            <tr class="bg-amber-50 bg-opacity-80">
-                                <th class="border border-amber-200 p-3 text-amber-700">Rank</th>
-                                <th class="border border-amber-200 p-3 text-amber-700">Participant</th>
-                                <th class="border border-amber-200 p-3 text-amber-700">Score</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardTable"></tbody>
-                    </table>
+            <!-- Leaderboard Section -->
+<div id="leaderboard" class="tab-content">
+    <div class="p-6 gradient-card rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-amber-500">🏆 Live Leaderboard</h3>
+        <table class="w-full mt-4 border-collapse bg-white bg-opacity-60">
+            <thead>
+                <tr class="bg-amber-50 bg-opacity-80">
+                    <th class="border border-amber-200 p-3 text-amber-700">Rank</th>
+                    <th class="border border-amber-200 p-3 text-amber-700">Participant</th>
+                    <th class="border border-amber-200 p-3 text-amber-700">Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardTable"></tbody>
+        </table>
 
-                    <button onclick="fetchLeaderboard()"
-                        class="w-full mt-4 p-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-md transition duration-300">
-                        🔄 Refresh Leaderboard
-                    </button>
-                </div>
-            </div>
+        <!-- ℹ️ Instructional Text -->
+        <p class="text-sm text-amber-700 mt-3 italic">
+            👉 Click the "Refresh Leaderboard" button to get the latest scores.
+        </p>
+
+        <button onclick="fetchLeaderboard()"
+            class="w-full mt-2 p-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-md transition duration-300">
+            🔄 Refresh Leaderboard
+        </button>
+    </div>
+</div>
+
 
             <!-- Performance Analysis -->
 
             <!-- Performance Analysis -->
+<!-- Performance Analysis --> 
 <div id="performance" class="tab-content">
     <div class="p-6 gradient-card rounded-lg shadow-md">
         <h3 class="text-xl font-semibold text-blue-600">📈 Performance Analysis</h3>
-        
+
+        <!-- ℹ️ Instruction + Generate Button -->
+      <!-- ℹ️ Instruction + Generate Button -->
+<div class="mt-2 mb-4">
+    <p class="text-sm text-blue-700 italic mb-1">
+        👉 Click the "Generate Analysis" button to view performance insights.
+    </p>
+    <button onclick="fetchPerformanceAnalysis()" 
+        class="inline-block px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-md transition duration-300">
+        📊 Generate Analysis
+    </button>
+</div>
+
+
         <!-- Performance Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
             <div class="p-4 bg-blue-50 rounded-lg shadow-sm">
@@ -393,7 +434,8 @@
                 <p class="text-xl font-bold text-amber-600 mt-1" id="topScore">-</p>
             </div>
         </div>
-        
+
+        <!-- Score Charts -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <!-- Score Distribution Chart -->
             <div class="bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
@@ -407,66 +449,33 @@
                 <canvas id="accuracyChart" height="220"></canvas>
             </div>
         </div>
-        
+
         <!-- Performance Trends -->
-        <div class="mt-6 bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
-            <h4 class="text-lg font-medium text-gray-700 mb-2">Performance Distribution</h4>
-            <canvas id="performanceDistribution" height="180"></canvas>
-        </div>
-        
+       
+
         <!-- Score Percentiles -->
-        <div class="mt-6 bg-white bg-opacity-80 p-4 rounded-lg shadow-sm">
-            <h4 class="text-lg font-medium text-gray-700 mb-2">Score Percentiles</h4>
-            <div class="relative pt-1">
-                <div class="flex mb-2 items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-200">
-                            Score Range
-                        </span>
-                    </div>
-                    <div class="text-right">
-                        <span id="percentileInfo" class="text-xs font-semibold inline-block text-blue-600">
-                            -
-                        </span>
-                    </div>
-                </div>
-                <div class="overflow-hidden h-6 mb-4 text-xs flex rounded bg-gray-200">
-                    <div id="p25" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500" style="width: 25%">
-                        25%
-                    </div>
-                    <div id="p50" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-500" style="width: 25%">
-                        50%
-                    </div>
-                    <div id="p75" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500" style="width: 25%">
-                        75%
-                    </div>
-                    <div id="p100" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500" style="width: 25%">
-                        100%
-                    </div>
-                </div>
-            </div>
-            <div class="grid grid-cols-4 gap-2 text-center text-sm">
-                <div>0-25th <span id="p25Value" class="font-semibold">-</span></div>
-                <div>25-50th <span id="p50Value" class="font-semibold">-</span></div>
-                <div>50-75th <span id="p75Value" class="font-semibold">-</span></div>
-                <div>75-100th <span id="p100Value" class="font-semibold">-</span></div>
-            </div>
-        </div>
-
-        <button onclick="fetchPerformanceAnalysis()" 
-        class="w-full mt-4 p-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md transition duration-300">
-        📊 Generate Analysis
-    </button>
+      
+    </div>
 </div>
-</div>
-
 
             
 
             <!-- Most Incorrect Questions -->
             <div id="incorrect" class="tab-content">
                 <div class="p-6 gradient-card rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-rose-500">❌ Most Incorrect Questions</h3>
+                    <h3 class="text-xl font-semibold text-rose-500">❌ Weak Topics</h3>
+                    
+                    <!-- ℹ️ Instruction Message + Button -->
+                    <div class="mt-2 mb-3">
+                        <p class="text-sm text-rose-700 italic mb-1">
+                            👉 Click the "Show Weakest Topics" button to identify where participants struggled most.
+                        </p>
+                        <button onclick="fetchIncorrectQuestions()" 
+                            class="inline-block px-3 py-1 bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium rounded-md transition duration-300">
+                            📊 Show Weakest Topics
+                        </button>
+                    </div>
+            
                     <table class="w-full mt-4 border-collapse bg-white bg-opacity-60">
                         <thead>
                             <tr class="bg-rose-50 bg-opacity-80">
@@ -477,42 +486,45 @@
                         </thead>
                         <tbody id="incorrectQuestionsTable"></tbody>
                     </table>
-
-                    <button onclick="fetchIncorrectQuestions()" 
-                        class="w-full mt-4 p-3 bg-rose-500 hover:bg-rose-600 text-white font-semibold rounded-md transition duration-300">
-                        📊 Show Incorrect Questions
-                    </button>
                 </div>
             </div>
-
+    
             <!-- Overall Quiz Analysis -->
-            <div id="analysis" class="tab-content">
-                <div class="p-6 gradient-card rounded-lg shadow-md">
-                    <h3 class="text-xl font-semibold text-purple-600">📊 Overall Quiz Analysis</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                        <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
-                            <p class="text-lg font-medium text-center text-purple-800">Success Rate</p>
-                            <p class="text-xl font-bold text-center text-purple-600 mt-2" id="successRate">-</p>
-                        </div>
-                        <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
-                            <p class="text-lg font-medium text-center text-purple-800">Average Score</p>
-                            <p class="text-xl font-bold text-center text-purple-600 mt-2" id="averageScore">-</p>
-                        </div>
-                        <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
-                            <p class="text-lg font-medium text-center text-purple-800">Difficulty Level</p>
-                            <p class="text-xl font-bold text-center text-purple-600 mt-2" id="difficultyLevel">-</p>
-                        </div>
-                    </div>
+<div id="analysis" class="tab-content">
+    <div class="p-6 gradient-card rounded-lg shadow-md">
+        <h3 class="text-xl font-semibold text-purple-600">📊 Overall Quiz Analysis</h3>
+        
+        <!-- ℹ️ Instruction Message + Smaller Button -->
+        <div class="mt-2 mb-3">
+            <p class="text-sm text-purple-700 italic mb-1">
+                👉 Click the "Show Quiz Analysis" button to view overall quiz performance.
+            </p>
+            <button onclick="fetchQuizAnalysis()" 
+                class="inline-block px-3 py-1 bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium rounded-md transition duration-300">
+                📊 Show Quiz Analysis
+            </button>
+        </div>
 
-                    <button onclick="fetchQuizAnalysis()" 
-                        class="w-full mt-4 p-3 bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-md transition duration-300">
-                        📊 Show Quiz Analysis
-                    </button>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
+                <p class="text-lg font-medium text-center text-purple-800">Success Rate</p>
+                <p class="text-xl font-bold text-center text-purple-600 mt-2" id="successRate">-</p>
+            </div>
+            <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
+                <p class="text-lg font-medium text-center text-purple-800">Average Score</p>
+                <p class="text-xl font-bold text-center text-purple-600 mt-2" id="averageScore">-</p>
+            </div>
+            <div class="p-4 bg-purple-50 bg-opacity-80 rounded-lg">
+                <p class="text-lg font-medium text-center text-purple-800">Difficulty Level</p>
+                <p class="text-xl font-bold text-center text-purple-600 mt-2" id="difficultyLevel">-</p>
             </div>
         </div>
     </div>
+</div>
+
+            
+
+            
 
     <script src="static/script.js"></script>
     
@@ -586,5 +598,14 @@
             });
         });
     </script>
+
+
+
+
+
+
+
+
+
 </body>
 </html>
