@@ -602,6 +602,12 @@ function createResponseChart(labels, data, correctAnswer) {
     });
 }
 
+function closeResultsModal() {
+    const modal = document.getElementById("questionResultsSection");
+    modal.classList.add("hidden");
+}
+
+
 // Modified function to move to the next question - unchanged core functionality
 function moveToNextQuestion() {
     clearInterval(hostTimer);
@@ -1119,6 +1125,7 @@ function selectAnswer(answer, button) {
     messageDiv.id = "answerMessage";
     messageDiv.className = "mt-4 p-2 bg-green-100 text-green-800 text-center rounded";
     messageDiv.textContent = "Answer submitted! Waiting for timer to complete...";
+    
     document.getElementById("options").appendChild(messageDiv);
 }
 
@@ -1821,6 +1828,7 @@ function addAIQuestionsToQuiz() {
 
 // Function to Fetch and Display Questions with Pagination
 
+
 function fetchFilteredQuestions() {
     let class_level = document.getElementById("filterClass").value;
     let subject = document.getElementById("filterSubject").value;
@@ -1862,7 +1870,6 @@ function fetchFilteredQuestions() {
     .catch(error => console.error("❌ Error fetching questions:", error));
 }
 
-
 function displayQuestions() {
     let questionsList = document.getElementById("questionsList");
     let pageNumber = document.getElementById("pageNumber");
@@ -1889,10 +1896,18 @@ function displayQuestions() {
         questionBox.innerHTML = `
             <h4 class="text-lg font-semibold text-gray-700 mb-2">${start + index + 1}. ${question.question}</h4>
             <ul class="space-y-2">
-                <li class="p-2 rounded ${question.correct_answer === question.option1 ? 'bg-green-200' : 'bg-gray-100'}">✅ ${question.option1}</li>
-                <li class="p-2 rounded ${question.correct_answer === question.option2 ? 'bg-green-200' : 'bg-gray-100'}">❌ ${question.option2}</li>
-                <li class="p-2 rounded ${question.correct_answer === question.option3 ? 'bg-green-200' : 'bg-gray-100'}">❌ ${question.option3}</li>
-                <li class="p-2 rounded ${question.correct_answer === question.option4 ? 'bg-green-200' : 'bg-gray-100'}">❌ ${question.option4}</li>
+                <li class="p-2 rounded ${question.correct_answer === question.option1 ? 'bg-green-200' : 'bg-gray-100'}">
+                    ${question.correct_answer === question.option1 ? '✅' : '❌'} ${question.option1}
+                </li>
+                <li class="p-2 rounded ${question.correct_answer === question.option2 ? 'bg-green-200' : 'bg-gray-100'}">
+                    ${question.correct_answer === question.option2 ? '✅' : '❌'} ${question.option2}
+                </li>
+                <li class="p-2 rounded ${question.correct_answer === question.option3 ? 'bg-green-200' : 'bg-gray-100'}">
+                    ${question.correct_answer === question.option3 ? '✅' : '❌'} ${question.option3}
+                </li>
+                <li class="p-2 rounded ${question.correct_answer === question.option4 ? 'bg-green-200' : 'bg-gray-100'}">
+                    ${question.correct_answer === question.option4 ? '✅' : '❌'} ${question.option4}
+                </li>
             </ul>
         `;
         questionsList.appendChild(questionBox);
@@ -1903,6 +1918,8 @@ function displayQuestions() {
     prevButton.style.display = currentPage > 1 ? "inline-flex" : "none";
     nextButton.style.display = end < questionsData.length ? "inline-flex" : "none";
 }
+
+
 
 
 
