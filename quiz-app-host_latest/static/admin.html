@@ -543,6 +543,8 @@ body::before {
                     <option value="8">Class 8</option>
                     <option value="9">Class 9</option>
                     <option value="10">Class 10</option>
+                    <option value="11">Class 11</option>
+                    <option value="12">Class 12</option>
                 </select>
             </div>
 
@@ -564,15 +566,25 @@ body::before {
                 <label class="form-label flex items-center">
                     <span class="mr-1 text-red-500">*</span>Book:
                 </label>
-                <input type="text" id="bookSelect" class="form-control" placeholder="Book Name">
+                <select id="bookSelect" class="form-control form-select">
+                    <option value="">Select Book</option>
+                    <option value="NCERT">NCERT</option>
+                    <option value="Sample Book">Sample Book</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label class="form-label flex items-center">
                     <span class="mr-1 text-red-500">*</span>Chapter:
                 </label>
-                <input type="text" id="chapterSelect" class="form-control" placeholder="Chapter">
+                <select id="chapterSelect" class="form-control form-select">
+                    <option value="">Select Chapter</option>
+                    <option value="Chapter 1">Chapter 1: Introduction</option>
+                    <option value="Chapter 2">Chapter 2: Basics</option>
+                    <option value="Chapter 3">Chapter 3: Practice Questions</option>
+                </select>
             </div>
+      
 
             <div class="form-group flex items-end">
                 <button onclick="proceedToCreateQuestion()" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white">
@@ -748,77 +760,78 @@ body::before {
         </div>
         
         <!-- Horizontal Filter Section -->
-        <div class="flex flex-wrap gap-4 mb-6">
-            <div class="flex-1 min-w-[200px]">
-                <label class="form-label flex items-center text-gray-700">
-                    <span class="mr-1 text-red-500">*</span>Class:
-                </label>
-                <select id="filterClass" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchBooks()">
-                    <option value="">Select Class</option>
-                    <option value="1">Class 1</option>
-                    <option value="2">Class 2</option>
-                    <option value="3">Class 3</option>
-                    <option value="4">Class 4</option>
-                    <option value="5">Class 5</option>
-                    <option value="6">Class 6</option>
-                    <option value="7">Class 7</option>
-                    <option value="8">Class 8</option>
-                    <option value="9">Class 9</option>
-                    <option value="10">Class 10</option>
-                    <option value="11">Class 11</option>
-                    <option value="12">Class 12</option>
-                </select>
-            </div>
-            
-            <div class="flex-1 min-w-[200px]">
-                <label class="form-label flex items-center text-gray-700">
-                    <span class="mr-1 text-red-500">*</span>Subject:
-                </label>
-                <select id="filterSubject" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchBooks()">
-                    <option value="">Select Subject</option>
-                    <option value="Math">Mathematics</option>
-                    <option value="Science">Science</option>
-                    <option value="English">English</option>
-                    <option value="Social Science">Social Science</option>
-                    <option value="Hindi">Hindi</option>
-                </select>
-            </div>
-            
-            <div class="flex-1 min-w-[200px]">
-                <label class="form-label flex items-center text-gray-700">
-                    <span class="mr-1 text-red-500">*</span>Book:
-                </label>
-                <select id="filterBook" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchChapters()">
-                    <option value="">Select Book</option>
-                </select>
-            </div>
-            
-            <div class="flex-1 min-w-[200px]">
-                <label class="form-label flex items-center text-gray-700">Chapter:</label>
-                <select id="filterChapter" class="form-control form-select w-full border border-gray-300 rounded-md">
-                    <option value="">Select Chapter</option>
-                </select>
-            </div>
-        </div>
-        
-        <button onclick="fetchFilteredQuestions()" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white mb-4">
-            <i class="fas fa-search"></i> Show Questions
-        </button>
+      <!-- Filters Section -->
+<div class="flex flex-wrap gap-4 mb-6">
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">
+            <span class="mr-1 text-red-500">*</span>Class:
+        </label>
+        <select id="filterClass" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchBooks()">
+            <option value="">Select Class</option>
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">
+            <span class="mr-1 text-red-500">*</span>Subject:
+        </label>
+        <select id="filterSubject" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchBooks()">
+            <option value="">Select Subject</option>
+            <option value="Math">Mathematics</option>
+            <option value="Science">Science</option>
+            <option value="English">English</option>
+            <option value="Social Science">Social Science</option>
+            <option value="Hindi">Hindi</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">
+            <span class="mr-1 text-red-500">*</span>Book:
+        </label>
+        <select id="filterBook" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchChapters()">
+            <option value="">Select Book</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">Chapter:</label>
+        <select id="filterChapter" class="form-control form-select w-full border border-gray-300 rounded-md">
+            <option value="">Select Chapter</option>
+        </select>
+    </div>
+</div>
 
-        <!-- Filtered Questions Display -->
-        <div id="questionsContainer" class="mt-4 space-y-3 hidden">
-            <h3 class="text-lg font-semibold text-gray-700">Filtered Questions</h3>
-            <div id="questionsList" class="bg-white p-4 rounded-lg shadow-sm"></div>
-            <div class="mt-4 flex justify-between items-center">
-                <button id="prevPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(-1)">
-                    ⬅️ Previous
-                </button>
-                <span id="pageNumber" class="text-gray-600">Page 1</span>
-                <button id="nextPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(1)">
-                    Next ➡️
-                </button>
-            </div>
-        </div>
+<button onclick="fetchFilteredQuestions()" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white mb-4">
+    <i class="fas fa-search"></i> Show Questions
+</button>
+
+<!-- Filtered Questions Display -->
+<div id="questionsContainer" class="mt-4 space-y-3 hidden">
+    <h3 class="text-lg font-semibold text-gray-700">Filtered Questions</h3>
+    <div id="questionsList" class="bg-white p-4 rounded-lg shadow-sm"></div>
+    <div class="mt-4 flex justify-between items-center">
+        <button id="prevPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(-1)">
+            ⬅️ Previous
+        </button>
+        <span id="pageNumber" class="text-gray-600">Page 1</span>
+        <button id="nextPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(1)">
+            Next ➡️
+        </button>
+    </div>
+</div>
 
        
     </div>
@@ -1070,10 +1083,17 @@ body::before {
             
 
  <!-- Pre/Post Assessment Tab -->
-<div id="pre-post" class="tab-content">
+ <div id="pre-post" class="tab-content">
     <div class="gradient-card">
-        <h3 class="text-xl font-semibold text-pink-500 mb-4">Assesment Set Generator</h3>
-        
+        <h3 class="text-xl font-semibold text-pink-500 mb-4">📚 Assessment Set Generator</h3>
+
+        <!-- ℹ️ Instruction Message -->
+        <div class="mb-4 p-3 bg-pink-50 border border-pink-200 rounded text-sm text-pink-700 shadow-sm">
+            👉 Please select a <strong>Class</strong> and <strong>Subject</strong> first, then click <strong>"Refresh Books"</strong>.<br>
+            After that, select a <strong>Book</strong> and click <strong>"Refresh Chapters"</strong>.<br>
+            Finally, choose a <strong>Chapter</strong> and you're ready to click <strong>"Generate Quizzes"</strong>! 🎯
+        </div>
+
         <!-- Horizontal Form Layout -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div class="form-group">
@@ -1127,17 +1147,16 @@ body::before {
                 </button>
             </div>
         </div>
-        
-        <!-- Debug buttons - Can be removed in production -->
+
+        <!-- Debug/Control Buttons -->
         <div class="flex space-x-2 mt-4">
             <button onclick="debugFetchBooks()" class="btn bg-gray-500 hover:bg-gray-600 text-white text-xs">
-                🔍 Debug Fetch Books
+                🔍 Refresh Books
             </button>
             <button onclick="fetchChaptersForPrePost()" class="btn bg-gray-500 hover:bg-gray-600 text-white text-xs">
-                🔄 Debug Fetch Chapters
+                🔄 Refresh Chapters
             </button>
         </div>
-        
         <!-- Success Message -->
         <p id="quizGenerationMessage" class="hidden text-green-500 font-semibold mt-4"></p>
         
@@ -1146,7 +1165,7 @@ body::before {
             <!-- Quiz IDs Display -->
             <div class="p-3 bg-green-50 border border-green-200 rounded-md mb-4 flex items-center">
                 <span class="text-green-600 mr-2"><i class="fas fa-check-circle"></i></span>
-                <p class="text-green-700 font-medium" id="quiz-ids-message">Pre & Post Assessment Quizzes Created! Pre-Quiz ID: <span id="pre-quiz-id">--</span>, Post-Quiz ID: <span id="post-quiz-id">--</span></p>
+              
             </div>
             
             <!-- Tabs -->
