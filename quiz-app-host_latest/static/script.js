@@ -86,8 +86,16 @@ function addQuestion() {
         return;
     }
 
-    // Check if the correct answer matches one of the options
+    // Check for duplicate options
     const options = [option1, option2, option3, option4];
+    const uniqueOptions = [...new Set(options)];
+    
+    if (uniqueOptions.length !== options.length) {
+        alert("Error: Duplicate options detected! Please make all options unique.");
+        return;
+    }
+
+    // Check if the correct answer matches one of the options
     const correctAnswerOption = document.getElementById("correctAnswerOption").value;
     
     // If a specific option was selected using the buttons (has correctAnswerOption)
@@ -129,6 +137,10 @@ function addQuestion() {
         } else {
             alert("Error: " + data.error);
         }
+    })
+    .catch(error => {
+        console.error("Error adding question:", error);
+        alert("An error occurred while adding the question. Please try again.");
     });
 }
 
@@ -425,6 +437,8 @@ let responseChart = null;
 function showHostQuestion() {
     if (hostCurrentQuestionIndex < hostCurrentQuestions.length) {
         let questionData = hostCurrentQuestions[hostCurrentQuestionIndex];
+        // Hide the Next Question button initially
+document.getElementById("nextQuestionBtn").style.display = "none";
         
         // Hide results section from previous question
         document.getElementById("questionResultsSection").classList.add("hidden");
@@ -476,6 +490,22 @@ function startHostTimer(seconds) {
             
             // Show response results when timer ends
             showQuestionResults();
+            
+            // Add this check to see if this was the last question
+            if (hostCurrentQuestionIndex === hostCurrentQuestions.length - 1) {
+                // This is the last question, show completion message
+                document.getElementById("hostQuizContainer").innerHTML = `
+                    <div class="p-6 bg-white bg-opacity-90 rounded-lg shadow-md text-center">
+                        <h3 class="text-xl font-bold text-green-600 mb-4">Quiz Completed!</h3>
+                        <p class="text-gray-700">All questions have been completed. Check the results in the Leaderboard and Analysis tabs.</p>
+                    </div>
+                `;
+                // Optional: Switch to the leaderboard tab when quiz is complete
+                // showTab('leaderboard');
+            } else {
+                // Not the last question, show the Next Question button
+                document.getElementById("nextQuestionBtn").style.display = "block";
+            }
         }
     }, 1000);
 }
@@ -486,6 +516,7 @@ function showQuestionResults() {
         console.error("Cannot show results: Invalid game PIN or question index");
         return;
     }
+    
     
     const currentQuestion = hostCurrentQuestions[hostCurrentQuestionIndex];
     const questionId = currentQuestion.question_id;
@@ -805,55 +836,6 @@ function fetchChapters() {
 
 // 🎯 Function to Join Quiz
 // Function to Join Quiz
-function joinQuiz() {
-    let playerName = document.getElementById("playerName").value;
-    let phoneNumber = document.getElementById("phoneNumber").value;
-    let emailId = document.getElementById("emailId").value;
-    let district = document.getElementById("districtSelect").value;
-    let gamePin = document.getElementById("gamePin").value;
-
-    if (!playerName || !phoneNumber || !emailId || !district || !gamePin) {
-        alert("⚠️ Please fill in all details before joining!");
-        return;
-    }
-
-    fetch("/join_quiz", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ playerName, phoneNumber, emailId, district, gamePin })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Store these values
-            currentGamePin = gamePin;
-            participantName = playerName;
-
-            // Hide join form
-            document.getElementById("joinForm").style.display = "none";
-            
-            // Show waiting screen instead of immediately showing quiz
-            const waitingDiv = document.createElement('div');
-            waitingDiv.id = 'waitingScreen';
-            waitingDiv.className = 'text-center py-8';
-            waitingDiv.innerHTML = `
-                <div class="mb-4">
-                    <div class="text-2xl font-bold text-blue-600">Waiting for host approval</div>
-                    <p class="text-gray-600 mt-2">The host will start the quiz shortly</p>
-                </div>
-                <div class="mx-auto my-6 w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            `;
-            
-            document.querySelector('.gov-card').appendChild(waitingDiv);
-            
-            // Start polling to check if quiz has started
-            checkQuizStatus(gamePin, playerName);
-        } else {
-            alert("❌ Error: " + data.error);
-        }
-    })
-    .catch(error => console.error("Error joining quiz:", error));
-}
 
 
 // Function to Join Quiz
@@ -863,8 +845,9 @@ function joinQuiz() {
     let emailId = document.getElementById("emailId").value;
     let district = document.getElementById("districtSelect").value;
     let gamePin = document.getElementById("gamePin").value;
+    let fullName = document.getElementById("Name").value;
 
-    if (!playerName || !phoneNumber || !emailId || !district || !gamePin) {
+    if (!fullName || !playerName || !phoneNumber || !emailId || !district || !gamePin) {
         alert("⚠️ Please fill in all details before joining!");
         return;
     }
@@ -885,6 +868,14 @@ function joinQuiz() {
             // Hide join form
             document.getElementById("joinForm").style.display = "none";
             
+            // Hide the "Join a Quiz" heading
+            const headings = document.querySelectorAll('h2.section-title');
+            headings.forEach(heading => {
+                if (heading.textContent.includes('Join a Quiz')) {
+                    heading.style.display = "none";
+                }
+            });
+            
             // Show waiting screen instead of immediately showing quiz
             const waitingDiv = document.createElement('div');
             waitingDiv.id = 'waitingScreen';
@@ -907,7 +898,6 @@ function joinQuiz() {
     })
     .catch(error => console.error("Error joining quiz:", error));
 }
-
 // Function to poll server for quiz status
 function checkQuizStatus(gamePin, playerName) {
     console.log("Starting to check quiz status...");
@@ -1120,15 +1110,25 @@ function selectAnswer(answer, button) {
         existingMessage.remove();
     }
     
-    // Show message that answer is locked
+    // Create a container div that will be centered
+    const centerContainer = document.createElement("div");
+    centerContainer.className = "flex justify-center w-full";
+    
+    // Create the message div
     const messageDiv = document.createElement("div");
     messageDiv.id = "answerMessage";
     messageDiv.className = "mt-4 p-2 bg-green-100 text-green-800 text-center rounded";
+    messageDiv.style.maxWidth = "400px"; // Set a max width for better appearance
+    messageDiv.style.margin = "0 auto"; // Center the div horizontally
     messageDiv.textContent = "Answer submitted! Waiting for timer to complete...";
     
-    document.getElementById("options").appendChild(messageDiv);
+    // Position this absolutely at the bottom of the quiz container
+    // Find the quiz container element
+    const quizContainer = document.getElementById("quizContainer");
+    
+    // Append the message directly to the quiz container rather than the options
+    quizContainer.appendChild(messageDiv);
 }
-
 // ✅ Modified Submit Answer Function - only advance when told to
 function submitAnswer(answer, advanceQuestion = true) {
     console.log(`Submitting answer: ${answer}, advance: ${advanceQuestion}`);
@@ -1173,6 +1173,7 @@ function submitAnswer(answer, advanceQuestion = true) {
 // ⏳ Timer Function (Moves to Next Question After Time Ends)
 // Replace the existing timer function
 // Modified timer function for participants
+// Modified timer function for participants
 function startTimer(seconds) {
     let timeLeft = seconds;
     document.getElementById("timer").textContent = `Time Left: ${timeLeft}s`;
@@ -1195,8 +1196,19 @@ function startTimer(seconds) {
                 submitAnswer("No Answer", false);
             }
             
-            // Show waiting message 
-            showWaitingForHost();
+            // Check if this is the last question
+            if (currentQuestionIndex === currentQuestions.length - 1) {
+                // Show quiz completion message
+                document.getElementById("quizContainer").innerHTML = `
+                    <div class="p-6 bg-white bg-opacity-90 rounded-lg shadow-md text-center">
+                        <h3 class="text-xl font-bold text-green-600 mb-4">Quiz Completed!</h3>
+                        <p class="text-gray-700">Thank you for participating!</p>
+                    </div>
+                `;
+            } else {
+                // Not the last question, show waiting message
+                showWaitingForHost();
+            }
         }
     }, 1000);
 }
@@ -1472,11 +1484,8 @@ function fetchPerformanceAnalysis() {
         
         // Update percentiles visualization
         updatePercentiles(data.scores);
-    })
-    .catch(error => {
-        console.error("Error fetching performance analysis:", error);
-        alert("Error fetching analysis. Check console.");
     });
+    
 }
 
 // Update performance summary cards
@@ -1828,7 +1837,7 @@ function addAIQuestionsToQuiz() {
 
 // Function to Fetch and Display Questions with Pagination
 
-
+// Modify fetchFilteredQuestions to display questions in a modal dialog
 function fetchFilteredQuestions() {
     let class_level = document.getElementById("filterClass").value;
     let subject = document.getElementById("filterSubject").value;
@@ -1857,7 +1866,9 @@ function fetchFilteredQuestions() {
         }
 
         if (data.questions.length === 0) {
+            // Show modal with no questions message
             document.getElementById("questionsList").innerHTML = "<p class='text-red-400'>❌ No questions found!</p>";
+            showQuestionsModal();
             return;
         }
 
@@ -1865,7 +1876,7 @@ function fetchFilteredQuestions() {
         questionsData = data.questions;
         currentPage = 1;
         displayQuestions(); // ✅ Render questions
-        document.getElementById("questionsContainer").classList.remove("hidden"); // ✅ Show container
+        showQuestionsModal(); // Show the modal instead of the container
     })
     .catch(error => console.error("❌ Error fetching questions:", error));
 }
@@ -1897,16 +1908,16 @@ function displayQuestions() {
             <h4 class="text-lg font-semibold text-gray-700 mb-2">${start + index + 1}. ${question.question}</h4>
             <ul class="space-y-2">
                 <li class="p-2 rounded ${question.correct_answer === question.option1 ? 'bg-green-200' : 'bg-gray-100'}">
-                    ${question.correct_answer === question.option1 ? '✅' : '❌'} ${question.option1}
+                    <span class="inline-block w-6 text-center">${question.correct_answer === question.option1 ? '<span class="text-green-600">✓</span>' : '<span class="text-red-600">✗</span>'}</span> ${question.option1}
                 </li>
                 <li class="p-2 rounded ${question.correct_answer === question.option2 ? 'bg-green-200' : 'bg-gray-100'}">
-                    ${question.correct_answer === question.option2 ? '✅' : '❌'} ${question.option2}
+                    <span class="inline-block w-6 text-center">${question.correct_answer === question.option2 ? '<span class="text-green-600">✓</span>' : '<span class="text-red-600">✗</span>'}</span> ${question.option2}
                 </li>
                 <li class="p-2 rounded ${question.correct_answer === question.option3 ? 'bg-green-200' : 'bg-gray-100'}">
-                    ${question.correct_answer === question.option3 ? '✅' : '❌'} ${question.option3}
+                    <span class="inline-block w-6 text-center">${question.correct_answer === question.option3 ? '<span class="text-green-600">✓</span>' : '<span class="text-red-600">✗</span>'}</span> ${question.option3}
                 </li>
                 <li class="p-2 rounded ${question.correct_answer === question.option4 ? 'bg-green-200' : 'bg-gray-100'}">
-                    ${question.correct_answer === question.option4 ? '✅' : '❌'} ${question.option4}
+                    <span class="inline-block w-6 text-center">${question.correct_answer === question.option4 ? '<span class="text-green-600">✓</span>' : '<span class="text-red-600">✗</span>'}</span> ${question.option4}
                 </li>
             </ul>
         `;
@@ -1919,14 +1930,30 @@ function displayQuestions() {
     nextButton.style.display = end < questionsData.length ? "inline-flex" : "none";
 }
 
-
-
-
-
 // Function to Handle Pagination Navigation
 function changePage(direction) {
     currentPage += direction;
     displayQuestions();
+}
+
+// Function to show the questions modal
+function showQuestionsModal() {
+    const modal = document.getElementById("questionsModal");
+    if (modal) {
+        modal.classList.remove("hidden");
+        document.body.style.overflow = "hidden"; // Prevent scrolling behind modal
+    } else {
+        console.error("Modal element not found");
+    }
+}
+
+// Function to hide the questions modal
+function hideQuestionsModal() {
+    const modal = document.getElementById("questionsModal");
+    if (modal) {
+        modal.classList.add("hidden");
+        document.body.style.overflow = ""; // Restore scrolling
+    }
 }
 
 
