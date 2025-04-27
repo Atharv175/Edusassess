@@ -3,183 +3,2481 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduAssess - Join a Quiz</title>
+    <title>EduAssess - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="/static/tailwind.css" rel="stylesheet">
+    <script src="static/script.js"></script>
     <style>
         :root {
-            --gov-primary: #205493;          /* Standard government blue */
-            --gov-secondary: #112e51;        /* Darker blue for contrast */
-            --gov-accent: #02bfe7;           /* Light blue accent */
-            --gov-light: #f1f9fc;            /* Very light blue tint for background */
-            --gov-border: #dce4ef;           /* Light blue-gray for borders */
-            --gov-text: #212121;             /* Dark gray for text */
-            --gov-header-bg: #ffffff;        /* White header background */
+            --primary: #4361ee;
+            --secondary: #5e60ce;
+            --success: #48c78e;
+            --warning: #ff9f43;
+            --info: #64b5f6;
+            --purple: #9381ff;
+            --pink: #ff76a6;
+            --teal: #4cc9bd;
+            --orange: #ff7849;
+            --bg: #f0f4f9;
+            --card-bg: #ffffff;
+            --dark-bg: #2a2d3e;
+            --border: #e0e5ec;
+            --text: #333333;
+            --text-light: #777777;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 8px;
+            --sidebar-bg: #1a2b6d; /* Dark blue color for sidebar */
+            --sidebar-text: #ffffff; /* White text for sidebar */
+            --sidebar-hover: #2a3c7e; /* Slightly lighter blue for hover */
+            --sidebar-active: #3a4c8e; /* Even lighter blue for active items */
         }
-        body {
-            background-color: var(--gov-light);
-            color: var(--gov-text);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        .gradient-card {
+            background: linear-gradient(to right, #ffffff, #f7f9fc);
+            transition: all 0.3s ease;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 25px;
         }
-        .gov-header {
-            background-color: var(--gov-header-bg);
-            border-bottom: 3px solid var(--gov-primary);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        
+        .gradient-card:hover {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
         }
-        .header-title {
-            color: var(--gov-secondary);
+        
+        .dashboard-header {
+            background: linear-gradient(to right, #4776E6, #8E54E9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .header-subtitle {
-            color: var(--gov-primary);
+        
+        .sidebar-item {
+            transition: all 0.2s ease;
+            border-left: 4px solid transparent;
+            color: var(--sidebar-text);
         }
-        .gov-card {
-            background-color: #ffffff;
-            border: 1px solid var(--gov-border);
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        
+        .sidebar-item:hover:not(.active) {
+            background-color: var(--sidebar-hover);
+            border-left: 4px solid #c7d2fe;
         }
-        .gov-label {
+        
+        .sidebar-item.active {
+            background-color: var(--sidebar-active);
+            border-left: 4px solid #3b82f6;
             font-weight: 600;
-            color: #212121;
-            margin-bottom: 0.25rem;
         }
-        .gov-input {
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
             display: block;
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #aeb0b5;
-            border-radius: 2px;
-            color: #212121;
-            background-color: #ffffff;
-            transition: border-color 0.2s ease;
+            animation: fadeIn 0.5s ease;
         }
-        .gov-input:focus {
-            outline: none;
-            border-color: var(--gov-primary);
-            box-shadow: 0 0 0 2px rgba(32, 84, 147, 0.3);
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
-        .gov-select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23212121' d='M6 9L0 3h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 0.75rem;
-            padding-right: 2.5rem;
-            appearance: none;
-        }
-        .gov-button {
-            background-color: var(--gov-primary);
-            color: white;
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
             border: none;
-            border-radius: 2px;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s;
         }
-        .gov-button:hover {
-            background-color: var(--gov-secondary);
-        }
+
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 15px;
         }
-        .quiz-container {
-            border: 1px solid var(--gov-border);
-            background-color: #ffffff;
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
         }
-        .timer-display {
-            color: #e31c3d;
-            font-weight: bold;
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.2s;
         }
-        .section-title {
-            color: var(--gov-primary);
-            font-weight: bold;
-            border-bottom: 2px solid var(--gov-border);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
         }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+            padding-right: 45px;
+        }
+        
+        .results-container {
+            background-color: var(--dark-bg);
+            color: white;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .results-title {
+            color: var(--info);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .results-stat {
+            margin: 8px 0;
+        }
+
+        .pre-rate {
+            color: var(--warning);
+        }
+
+        .post-rate {
+            color: var(--success);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            font-size: 100px;
+            opacity: 0;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 15px;
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        body {
+    background-image: url('https://img.freepik.com/free-vector/school-classroom-interior-university-educational-concept-blackboard-table_1441-1694.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+/*.content-wrapper {
+    background-color: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.gradient-card {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.7), rgba(247, 249, 252, 0.7));
+    backdrop-filter: blur(3px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.gradient-card:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+.dashboard-sidebar {
+    background-color: rgba(10, 32, 87, 0.95);
+    backdrop-filter: blur(8px);
+    color: #a3b3d9;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+}*/
+
+body {
+    background-image: url('https://img.freepik.com/free-vector/school-classroom-interior-university-educational-concept-blackboard-table_1441-1694.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+}
+
+/* Add an overlay to make background more opaque */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.6); /* White overlay to make image more opaque */
+    backdrop-filter: blur(5px); /* Increased blur from 3px to 5px */
+    z-index: -1;
+}
+
+/* Main content wrapper with more opacity */
+.content-wrapper {
+    background-color: rgba(255, 255, 255, 0.75); /* Increased from 0.65 to 0.75 */
+    backdrop-filter: blur(5px); /* Increased blur */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    position: relative; /* Ensure it sits above the body overlay */
+}
+
+.gradient-card {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(247, 249, 252, 0.8)); /* Increased from 0.7 to 0.8 */
+    backdrop-filter: blur(4px); /* Slightly increased blur */
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.gradient-card:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.bg-purple-50, .bg-amber-50, .bg-rose-50 {
+    background-opacity: 0.7; /* Increased opacity from 0.6 to 0.7 */
+}
+
+.background-image {
+    opacity: 0.6; /* Decreased from 0.8 to 0.6 to make it less visible */
+}
+
+/* Main content wrapper with semi-transparent background */
+
+
     </style>
 </head>
-<body>
-    <header class="gov-header py-3">
-        <div class="max-w-6xl mx-auto px-4 flex items-center">
-            <div class="flex items-center">
-                <h1 class="text-2xl font-bold header-title">EduAssess</h1>
-                <div class="ml-4 pl-4 border-l border-gray-300">
-                    <p class="header-subtitle font-medium">Ministry of Education</p>
+<body class="bg-gray-50 text-gray-800">
+    <div class="flex min-h-screen">
+        <!-- Left Sidebar with Dark Blue Background -->
+        <div class="w-64 flex flex-col" style="background-color: var(--sidebar-bg);">
+            <div class="p-4 border-b border-opacity-20 border-gray-200">
+                <h1 class="text-xl font-bold text-white">EduAssess Admin</h1>
+            </div>
+            
+            <!-- Navigation Items -->
+            <nav class="flex-1 pt-4">
+                <button onclick="showTab('create-quiz')" class="sidebar-item active w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span><i class="fas fa-plus"></i></span>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="showTab('existing-questions')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span><i class="fas fa-list-check"></i></span>
+                    <span>Question Bank</span>
+                </button>
+                <button onclick="showTab('pre-post')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span><i class="fas fa-random"></i></span>
+                    <span>Assesment Set Generator</span>
+                </button>
+                <button onclick="showTab('compare')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span><i class="fas fa-chart-line"></i></span>
+                    <span>Compare Training</span>
+                </button>
+                <button onclick="showTab('ai-generator')" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span><i class="fas fa-robot"></i></span>
+                    <span>AI Assesment Set</span>
+                </button>
+                <button onclick="showTab('assignment-summary', event)" class="sidebar-item w-full text-left px-6 py-3 flex items-center space-x-3">
+                    <span><i class="fas fa-book"></i></span>
+                    <span>Assesment analytics</span>
+                </button>
+            </nav>
+            
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 p-8">
+            <h2 class="text-2xl font-bold mb-6">Admin Dashboard</h2>
+<!-- Create Quiz Tab -->
+
+<!-- Dashboard Tab (redesigned to match the images) -->
+<!-- Updated Dashboard with Colorful Cards -->
+<div id="create-quiz" class="tab-content active">
+    <div class="p-6">
+        <h2 class="text-xl font-bold mb-6 text-gray-800">Dashboard</h2>
+        
+        <!-- Subject Level Analysis -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6 border border-gray-100">
+            <div class="flex items-center mb-3">
+               
+                <h3 class="text-base font-semibold text-gray-700">Subject Level Analysis</h3>
+            </div>
+            <div class="grid grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Subject</label>
+                    <select class="w-full border border-gray-200 rounded-md p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All Subjects</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">Class</label>
+                    <select class="w-full border border-gray-200 rounded-md p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All Classes</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">State</label>
+                    <select class="w-full border border-gray-200 rounded-md p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All States</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">District</label>
+                    <select class="w-full border border-gray-200 rounded-md p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All Districts</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">School</label>
+                    <select class="w-full border border-gray-200 rounded-md p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option>All Schools</option>
+                    </select>
                 </div>
             </div>
         </div>
-    </header>
-
-    <div class="max-w-4xl mx-auto my-8 px-4">
-        <div class="gov-card p-8">
-            <h2 class="section-title text-2xl text-center">Join a Quiz</h2>
-            
-
-            <!-- Join Form -->
-            <div id="joinForm">
-
-                <div class="form-group">
-                    <label for="Name" class="gov-label">Name</label>
-                    <input id="Name" class="gov-input" placeholder="Enter your full name">
+        
+        <!-- Participation Metrics -->
+        <div class="mb-6">
+            <div class="flex items-center mb-3">
+               
+                <h3 class="text-base font-semibold text-gray-700">Participation Metrics</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-blue-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-blue-100">Active Participants</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">12,345</h4>
+                        <i class="fas fa-user-group text-xl"></i>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="playerName" class="gov-label">Preferred Name</label>
-                    <input id="playerName" class="gov-input" placeholder="Enter your preferred name">
+                <div class="bg-purple-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-purple-100">Questions in Bank</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">5,678</h4>
+                        <i class="fas fa-question text-xl"></i>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="phoneNumber" class="gov-label">Phone Number</label>
-                    <input id="phoneNumber" type="tel" class="gov-input" placeholder="Enter your phone number">
+                <div class="bg-green-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-green-100">Assessment Sets</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">234</h4>
+                        <i class="fas fa-folder text-xl"></i>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="emailId" class="gov-label">Email ID</label>
-                    <input id="emailId" type="email" class="gov-input" placeholder="Enter your email address">
+            </div>
+        </div>
+        
+        <!-- Geographic Participation -->
+        <div class="mb-6">
+            <div class="flex items-center mb-3">
+               
+                <h3 class="text-base font-semibold text-gray-700">Geographic Participation</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-blue-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-blue-100">States</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">28</h4>
+                        <i class="fas fa-map text-xl"></i>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="districtSelect" class="gov-label">Select District</label>
-                    <select id="districtSelect" class="gov-input gov-select">
-                        <option value="">Select District</option>
-                        <option value="Bhopal">Bhopal</option>
-                        <option value="Indore">Indore</option>
-                        <option value="Jabalpur">Jabalpur</option>
-                        <option value="Gwalior">Gwalior</option>
-                    </select>
+                <div class="bg-purple-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-purple-100">Districts</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">156</h4>
+                        <i class="fas fa-building text-xl"></i>
+                    </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="gamePin" class="gov-label">Game PIN</label>
-                    <input id="gamePin" class="gov-input" placeholder="Enter the game PIN">
+                <div class="bg-yellow-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-yellow-100">Schools</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">3,421</h4>
+                        <i class="fas fa-school text-xl"></i>
+                    </div>
                 </div>
+            </div>
+        </div>
+        
+        <!-- Training Effectiveness -->
+        <div class="mb-6">
+            <div class="flex items-center mb-3">
+               
+                <h3 class="text-base font-semibold text-gray-700">Training Effectiveness</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-red-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-red-100">Pre-Assessment</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">40%</h4>
+                        <i class="fas fa-pencil text-xl"></i>
+                    </div>
+                </div>
+                <div class="bg-green-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-green-100">Post-Training</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">50%</h4>
+                        <i class="fas fa-graduation-cap text-xl"></i>
+                    </div>
+                </div>
+                <div class="bg-teal-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-teal-100">Improvement</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <h4 class="text-2xl font-bold">+25%</h4>
+                        <i class="fas fa-arrow-trend-up text-xl"></i>
+                    </div>
+                </div>
+            </div>
+          
+        </div>
+        
+        <!-- Subject Insights -->
+        <div class="mb-6">
+            <div class="flex items-center mb-3">
+               
+                <h3 class="text-base font-semibold text-gray-700">Subject Insights</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-amber-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-amber-100">Top 5 Weak Topics</p>
+                    <ul class="mt-2 text-sm space-y-1">
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>Quadratic Equations</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>Cell Biology</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>Shakespeare Analysis</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>World War II</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>Chemical Bonding</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-blue-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-blue-100">Top 2 Strong Subjects</p>
+                    <ul class="mt-2 text-sm space-y-1">
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>Basic Algebra</span>
+                        </li>
+                        <li class="flex items-center">
+                            <span class="w-1.5 h-1.5 bg-white rounded-full mr-2"></span>
+                            <span>Newtonian Physics</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-teal-500 text-white rounded-lg shadow-md p-4 relative overflow-hidden">
+                    <p class="text-sm text-teal-100">Most Improved Topic</p>
+                    <div class="flex items-center mt-4">
+                        <span class="w-2 h-2 bg-white rounded-full mr-2"></span>
+                        <span class="text-lg font-medium">Grammar Fundamentals</span>
+                    </div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+</div>
 
-                <button onclick="joinQuiz()" class="gov-button w-full mt-6">
-                    Join Quiz
-                </button>
+
+<!-- Add Questions Tab -->
+<div id="add-questions" class="tab-content">
+    <!-- Step 1: Question Details Selection -->
+    <div id="question-details-step" class="gradient-card">
+        <h3 class="text-xl font-semibold text-green-600 mb-4">Add Question Details</h3>
+
+        <!-- Horizontal form layout using grid -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="form-group">
+                <label class="form-label flex items-center">
+                    <span class="mr-1 text-red-500">*</span>Class:
+                </label>
+                <select id="classSelect" class="form-control form-select">
+                    <option value="">Select Class</option>
+                    <option value="1">Class 1</option>
+                    <option value="2">Class 2</option>
+                    <option value="3">Class 3</option>
+                    <option value="4">Class 4</option>
+                    <option value="5">Class 5</option>
+                    <option value="6">Class 6</option>
+                    <option value="7">Class 7</option>
+                    <option value="8">Class 8</option>
+                    <option value="9">Class 9</option>
+                    <option value="10">Class 10</option>
+                    <option value="11">Class 11</option>
+                    <option value="12">Class 12</option>
+                </select>
             </div>
 
-            <!-- Quiz Questions -->
-            <div id="quizContainer" class="hidden mt-8 text-center quiz-container p-6">
-                <h3 id="questionText" class="text-xl font-semibold text-gray-800 mb-6"></h3>
-                
-                <div id="options" class="mt-6 grid grid-cols-2 gap-4">
-                    <!-- Options will be dynamically inserted here -->
+            <div class="form-group">
+                <label class="form-label flex items-center">
+                    <span class="mr-1 text-red-500">*</span>Subject:
+                </label>
+                <select id="subjectSelect" class="form-control form-select">
+                    <option value="">Select Subject</option>
+                    <option value="Math">Mathematics</option>
+                    <option value="Science">Science</option>
+                    <option value="English">English</option>
+                    <option value="Social Science">Social Science</option>
+                    <option value="Hindi">Hindi</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label flex items-center">
+                    <span class="mr-1 text-red-500">*</span>Book:
+                </label>
+                <select id="bookSelect" class="form-control form-select">
+                    <option value="">Select Book</option>
+                    <option value="NCERT">NCERT</option>
+                    <option value="Sample Book">Sample Book</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label flex items-center">
+                    <span class="mr-1 text-red-500">*</span>Chapter:
+                </label>
+                <select id="chapterSelect" class="form-control form-select">
+                    <option value="">Select Chapter</option>
+                    <option value="Chapter 1">Chapter 1: Introduction</option>
+                    <option value="Chapter 2">Chapter 2: Basics</option>
+                    <option value="Chapter 3">Chapter 3: Practice Questions</option>
+                </select>
+            </div>
+      
+
+            <div class="form-group flex items-end">
+                <button onclick="proceedToCreateQuestion()" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white">
+                    Next
+                </button>
+            </div>
+        </div>
+
+        <div class="flex justify-start mt-4">
+            <button onclick="cancelAddQuestion()" class="btn bg-gray-300 hover:bg-gray-400 text-gray-800">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 2: Create Question -->
+    <div id="create-question-step" class="gradient-card hidden">
+        <div class="flex items-center mb-4">
+            <button onclick="backToQuestionDetails()" class="mr-3 text-blue-500 hover:text-blue-700">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <h3 class="text-xl font-semibold text-green-600">Create Question</h3>
+        </div>
+
+        <div class="mb-4 p-3 bg-blue-50 rounded-md">
+            <p class="text-sm text-blue-700">
+                <span class="font-medium">Question Details:</span>
+                <span id="selectedClass"></span> | 
+                <span id="selectedSubject"></span> | 
+                <span id="selectedBook"></span> | 
+                <span id="selectedChapter"></span>
+            </p>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Question:</label>
+            <input type="text" id="questionText" placeholder="Enter Question" class="form-control">
+        </div>
+
+        <div class="mt-4">
+            <label class="form-label">Answer Options:</label>
+            <p class="text-xs text-gray-500 mb-2">Click on the colored circle to mark the correct answer</p>
+            
+            <div class="space-y-3">
+                <div class="flex items-center">
+                    <button class="option-circle bg-blue-500 h-5 w-5 rounded-full mr-3 flex-shrink-0" data-option="1" onclick="markCorrectAnswer(1)"></button>
+                    <input type="text" id="option1" placeholder="Option 1" class="form-control">
                 </div>
                 
-                <div class="mt-6">
-                    <h4 id="timer" class="timer-display text-lg"></h4>
+                <div class="flex items-center">
+                    <button class="option-circle bg-amber-500 h-5 w-5 rounded-full mr-3 flex-shrink-0" data-option="2" onclick="markCorrectAnswer(2)"></button>
+                    <input type="text" id="option2" placeholder="Option 2" class="form-control">
+                </div>
+                
+                <div class="flex items-center">
+                    <button class="option-circle bg-red-500 h-5 w-5 rounded-full mr-3 flex-shrink-0" data-option="3" onclick="markCorrectAnswer(3)"></button>
+                    <input type="text" id="option3" placeholder="Option 3" class="form-control">
+                </div>
+                
+                <div class="flex items-center">
+                    <button class="option-circle bg-green-500 h-5 w-5 rounded-full mr-3 flex-shrink-0" data-option="4" onclick="markCorrectAnswer(4)"></button>
+                    <input type="text" id="option4" placeholder="Option 4" class="form-control">
+                </div>
+            </div>
+            
+            <div class="form-group mt-3">
+                <input type="hidden" id="correctAnswerOption">
+                <input type="text" id="correctAnswer" placeholder="Correct Answer (Option Number or Value)" class="form-control">
+            </div>
+        </div>
+
+        <div class="flex justify-end mt-6">
+            <button onclick="addQuestion()" class="btn w-full bg-green-500 hover:bg-green-600 text-white">
+                <i class="fas fa-plus"></i> Add Question
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Function to go back to question details step
+    function backToQuestionDetails() {
+        document.getElementById('create-question-step').classList.add('hidden');
+        document.getElementById('question-details-step').classList.remove('hidden');
+    }
+
+    // Function to proceed to create question step
+    function proceedToCreateQuestion() {
+        // Validate required fields
+        const classValue = document.getElementById('classSelect').value;
+        const subjectValue = document.getElementById('subjectSelect').value;
+        const bookValue = document.getElementById('bookSelect').value;
+        const chapterValue = document.getElementById('chapterSelect').value;
+        
+        if (!classValue || !subjectValue || !bookValue || !chapterValue) {
+            alert('Please fill in all required fields (Class, Subject, Book, Chapter)');
+            return;
+        }
+        
+        // Update the display info in the next step
+        document.getElementById('selectedClass').textContent = 'Class ' + classValue;
+        document.getElementById('selectedSubject').textContent = document.getElementById('subjectSelect').options[document.getElementById('subjectSelect').selectedIndex].text;
+        document.getElementById('selectedBook').textContent = bookValue;
+        document.getElementById('selectedChapter').textContent = chapterValue;
+        
+        // Hide the first step and show the second step
+        document.getElementById('question-details-step').classList.add('hidden');
+        document.getElementById('create-question-step').classList.remove('hidden');
+        
+        // Set focus on the question text area
+        document.getElementById('questionText').focus();
+    }
+
+    // Function to mark the correct answer
+    function markCorrectAnswer(optionNumber) {
+        // Reset all circles to their original state
+        document.querySelectorAll('.option-circle').forEach(circle => {
+            circle.innerHTML = '';
+        });
+        
+        // Mark the selected circle
+        const selectedCircle = document.querySelector(`.option-circle[data-option="${optionNumber}"]`);
+        selectedCircle.innerHTML = '<i class="fas fa-check text-white text-xs flex justify-center"></i>';
+        
+        // Get the corresponding option text
+        const optionText = document.getElementById(`option${optionNumber}`).value;
+        
+        // Set both the option number and option text as correct answer
+        document.getElementById('correctAnswerOption').value = optionNumber;
+        document.getElementById('correctAnswer').value = optionText;
+    }
+
+    // Function to cancel adding a question
+    function cancelAddQuestion() {
+        if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+            // Reset the form
+            document.getElementById('classSelect').value = '';
+            document.getElementById('subjectSelect').value = '';
+            document.getElementById('bookSelect').value = '';
+            document.getElementById('chapterSelect').value = '';
+            
+            // Switch back to the dashboard tab
+            showTab('create-quiz');
+        }
+    }
+
+    // Add event listeners when the document is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add input event listeners for the option fields to update correct answer if needed
+        ['option1', 'option2', 'option3', 'option4'].forEach((id, index) => {
+            document.getElementById(id).addEventListener('input', function() {
+                const correctAnswerOption = document.getElementById('correctAnswerOption').value;
+                if (correctAnswerOption == (index + 1)) {
+                    document.getElementById('correctAnswer').value = this.value;
+                }
+            });
+        });
+    });
+</script>
+
+
+            
+
+   
+<!-- Existing Questions Tab with Horizontal Filters -->
+<div id="existing-questions" class="tab-content">
+    <div class="gradient-card">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-blue-600">Question Bank</h3>
+            <button onclick="showTab('add-questions')" class="btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md flex items-center">
+                <i class="fas fa-plus mr-2"></i> Add Question
+            </button>
+        </div>
+        
+        <!-- Horizontal Filter Section -->
+      <!-- Filters Section -->
+<div class="flex flex-wrap gap-4 mb-6">
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">
+            <span class="mr-1 text-red-500">*</span>Class:
+        </label>
+        <select id="filterClass" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchBooks()">
+            <option value="">Select Class</option>
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">
+            <span class="mr-1 text-red-500">*</span>Subject:
+        </label>
+        <select id="filterSubject" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchBooks()">
+            <option value="">Select Subject</option>
+            <option value="Math">Mathematics</option>
+            <option value="Science">Science</option>
+            <option value="English">English</option>
+            <option value="Social Science">Social Science</option>
+            <option value="Hindi">Hindi</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">
+            <span class="mr-1 text-red-500">*</span>Book:
+        </label>
+        <select id="filterBook" class="form-control form-select w-full border border-gray-300 rounded-md" onchange="fetchChapters()">
+            <option value="">Select Book</option>
+        </select>
+    </div>
+    
+    <div class="flex-1 min-w-[200px]">
+        <label class="form-label flex items-center text-gray-700">Chapter:</label>
+        <select id="filterChapter" class="form-control form-select w-full border border-gray-300 rounded-md">
+            <option value="">Select Chapter</option>
+        </select>
+    </div>
+</div>
+<!-- Keep your original button -->
+<button onclick="fetchFilteredQuestions()" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white mb-4">
+    <i class="fas fa-search"></i> Show Questions
+</button>
+
+<!-- Modal Dialog for Questions -->
+<div id="questionsModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex justify-center items-center hidden">
+    <div class="bg-white rounded-lg shadow-xl w-4/5 md:w-3/4 lg:w-2/3 max-h-[90vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b p-4">
+            <h3 class="text-xl font-semibold text-gray-700">Filtered Questions</h3>
+            <button onclick="hideQuestionsModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="overflow-y-auto p-4 flex-grow">
+            <div id="questionsList" class="space-y-4"></div>
+        </div>
+        
+        <!-- Modal Footer with Pagination -->
+        <div class="border-t p-4 flex justify-between items-center">
+            <button id="prevPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(-1)">
+                ⬅️ Previous
+            </button>
+            <span id="pageNumber" class="text-gray-600">Page 1</span>
+            <button id="nextPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(1)">
+                Next ➡️
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden container (keeping this for compatibility if needed) -->
+<div id="questionsContainer" class="hidden">
+    <!-- This container is now hidden but kept for compatibility -->
+</div>
+
+
+</div>
+</div>
+
+
+
+
+
+<!-- Compare Training Tab -->
+<div id="compare" class="tab-content">
+    <div id="compare-premium-lock" class="flex justify-center items-center h-full">
+        <!-- Premium Upgrade Popup -->
+        <div class="bg-white rounded-lg shadow-xl max-w-lg overflow-hidden">
+            <!-- Header with gradient background -->
+            <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-5 text-white relative">
+                <div class="absolute top-0 right-0">
+                    <div class="bg-yellow-400 transform rotate-45 px-6 py-1 text-xs font-bold uppercase text-amber-800 -mr-10 mt-3">
+                        Premium
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold">Training Comparison Tool</h2>
+                <p class="text-sm mt-1">Advanced analytics for pre and post assessment comparison</p>
+            </div>
+            
+            <!-- Features List -->
+            <div class="p-6 bg-white">
+                <ul class="space-y-4">
+                    <li class="flex items-center">
+                        <span class="bg-amber-100 text-amber-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Compare pre and post training effectiveness</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-amber-100 text-amber-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Detailed improvement metrics by topic</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-amber-100 text-amber-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Visual report generation and export</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-amber-100 text-amber-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Training ROI and effectiveness calculation</span>
+                    </li>
+                </ul>
+                
+                <div class="mt-6 text-center">
+                    <button onclick="unlockCompareFeature()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-medium py-2 px-6 rounded-full transition duration-300">
+                        Enter Access Key
+                    </button>
                 </div>
             </div>
         </div>
     </div>
+    
+    <div id="compare-content" class="hidden">
+        <div class="gradient-card">
+            <h3 class="text-xl font-semibold text-amber-500 mb-4">Compare Training Effectiveness</h3>
+            <div class="form-group">
+                <label class="form-label">Enter Pre-Training Game PIN:</label>
+                <input type="text" id="preTrainingPin" placeholder="Enter Pre-Training Game PIN" class="form-control">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Enter Post-Training Game PIN:</label>
+                <input type="text" id="postTrainingPin" placeholder="Enter Post-Training Game PIN" class="form-control">
+            </div>
+            <button onclick="compareQuizzes()" class="btn w-full bg-amber-500 hover:bg-amber-600 text-white">
+                <i class="fas fa-chart-bar"></i> Compare Performance
+            </button>
 
-    <footer class="bg-white py-4 text-center text-gray-600 text-sm border-t border-gray-300">
-        <div class="max-w-6xl mx-auto px-4">
-            <p>© 2025 Ministry of Education - EduAssess Platform</p>
+            <!-- Result Display Box -->
+            <div id="comparisonResults" class="hidden results-container">
+                <h3 class="results-title">Training Improvement Summary</h3>
+                <p class="results-stat">Pre-Training Success Rate: <span id="preSuccessRate" class="pre-rate font-bold"></span>%</p>
+                <p class="results-stat">Post-Training Success Rate: <span id="postSuccessRate" class="post-rate font-bold"></span>%</p>
+                <p class="mt-2 font-semibold" id="improvementMessage"></p>
+            </div>
         </div>
-    </footer>
+    </div>
+</div>
 
-    <script src="script.js"></script>
+
+            <!-- AI Generator Tab -->
+             <!--
+            <div id="ai-generator" class="tab-content">
+                <div class="gradient-card">
+                    <h3 class="text-xl font-semibold text-purple-600 mb-4">AI-Powered Question Generator</h3>
+                    <div class="form-group">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="fileInput" accept=".pdf,.txt,.docx" class="file-input">
+                            <label for="fileInput" class="file-input-label">
+                                <i class="fas fa-upload"></i> Choose File
+                            </label>
+                        </div>
+                    </div>
+                    <button onclick="uploadAndGenerateQuestions()" class="btn w-full bg-purple-500 hover:bg-purple-600 text-white">
+                        <i class="fas fa-magic"></i> Generate Questions
+                    </button>
+
+                
+                    <div id="aiQuestionsContainer" class="mt-6 hidden">
+                        <h3 class="text-lg font-semibold text-purple-600">AI-Generated Questions</h3>
+                        <ul id="aiQuestionsList" class="mt-4 space-y-3 bg-white p-4 rounded-lg shadow-sm"></ul>
+                        
+                        <button onclick="addAIQuestionsToQuiz()" class="btn w-full bg-green-500 hover:bg-green-600 text-white mt-4">
+                            <i class="fas fa-plus"></i> Add to Quiz
+                        </button>
+                    </div>
+                </div>
+            </div>
+        -->
+        
+        <!-- AI Generator Tab -->
+<div id="ai-generator" class="tab-content">
+    <div class="flex justify-center items-center h-full">
+        <!-- Premium Upgrade Popup -->
+        <div class="bg-white rounded-lg shadow-xl max-w-lg overflow-hidden">
+            <!-- Header with gradient background -->
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-5 text-white relative">
+                <div class="absolute top-0 right-0">
+                    <div class="bg-yellow-400 transform rotate-45 px-6 py-1 text-xs font-bold uppercase text-blue-800 -mr-10 mt-3">
+                        New
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold">Unlock AI Brain</h2>
+                <p class="text-sm mt-1">Upgrade to Premium for Enhanced AI Knowledge Management</p>
+            </div>
+            
+            <!-- Features List -->
+            <div class="p-6 bg-white">
+                <ul class="space-y-4">
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Unlimited knowledge updates to AI repository</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Unlimited AI Assessment Set generations</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Advanced AI learning from your custom materials</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Priority access to all new AI features and updates</span>
+                    </li>
+                </ul>
+                
+                <div class="mt-6 text-center">
+                    <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2 px-6 rounded-full transition duration-300">
+                        Upgrade to Premium
+                    </button>
+                </div>
+                
+                <div class="mt-4 text-center text-xs text-gray-500">
+                    Already have Premium? <a href="#" class="text-blue-500">Sign in with your Premium account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+
+
+            <!-- Move this div inside the main content area -->
+<!--             
+<div id="assignment-summary" class="tab-content" style="display: none;">
+    <div class="gradient-card">
+        <h3 class="text-xl font-semibold text-blue-600 mb-4">Last 10 Quizzes</h3>
+        <div id="quizListContainer" class="mt-4">
+            <p class="text-gray-600">Fetching quizzes...</p>
+        </div>
+    </div>
+</div>
+-->
+
+<!-- Assessment Summary Tab -->
+<div id="assignment-summary" class="tab-content" style="display: none;">
+    <div class="flex justify-center items-center h-full">
+        <!-- Premium Upgrade Popup -->
+        <div class="bg-white rounded-lg shadow-xl max-w-lg overflow-hidden">
+            <!-- Header with gradient background -->
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 p-5 text-white relative">
+                <div class="absolute top-0 right-0">
+                    <div class="bg-yellow-400 transform rotate-45 px-6 py-1 text-xs font-bold uppercase text-blue-800 -mr-10 mt-3">
+                        New
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold">Unlock AI Brain</h2>
+                <p class="text-sm mt-1">Upgrade to Premium for Enhanced AI Knowledge Management</p>
+            </div>
+            
+            <!-- Features List -->
+            <div class="p-6 bg-white">
+                <ul class="space-y-4">
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Unlimited knowledge updates to AI repository</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Unlimited AI Assessment Set generations</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Advanced AI learning from your custom materials</span>
+                    </li>
+                    <li class="flex items-center">
+                        <span class="bg-blue-100 text-blue-500 p-1 rounded-full mr-3">
+                            <i class="fas fa-check text-xs"></i>
+                        </span>
+                        <span>Priority access to all new AI features and updates</span>
+                    </li>
+                </ul>
+                
+                <div class="mt-6 text-center">
+                    <button class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-2 px-6 rounded-full transition duration-300">
+                        Upgrade to Premium
+                    </button>
+                </div>
+                
+                <div class="mt-4 text-center text-xs text-gray-500">
+                    Already have Premium? <a href="#" class="text-blue-500">Sign in with your Premium account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            
+ <!-- Pre/Post Assessment Tab -->
+ <div id="pre-post" class="tab-content">
+    <div class="gradient-card">
+        <h3 class="text-xl font-semibold text-pink-500 mb-4">📚 Assessment Set Generator</h3>
+
+        <!-- ℹ️ Instruction Message -->
+        
+
+        <!-- Horizontal Form Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="form-group">
+                <label class="form-label">Select Class:</label>
+                <select id="prePostClass" class="form-control form-select">
+                    <option value="">Select Class</option>
+                    <option value="1">Class 1</option>
+                    <option value="2">Class 2</option>
+                    <option value="3">Class 3</option>
+                    <option value="4">Class 4</option>
+                    <option value="5">Class 5</option>
+                    <option value="6">Class 6</option>
+                    <option value="7">Class 7</option>
+                    <option value="8">Class 8</option>
+                    <option value="9">Class 9</option>
+                    <option value="10">Class 10</option>
+                    <option value="11">Class 11</option>
+                    <option value="12">Class 12</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Select Subject:</label>
+                <select id="prePostSubject" class="form-control form-select">
+                    <option value="">Select Subject</option>
+                    <option value="Math">Mathematics</option>
+                    <option value="Science">Science</option>
+                    <option value="English">English</option>
+                    <option value="Social Science">Social Science</option>
+                    <option value="Hindi">Hindi</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Select Book:</label>
+                <select id="prePostBook" class="form-control form-select">
+                    <option value="">Select Book</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Select Chapter:</label>
+                <select id="prePostChapter" class="form-control form-select">
+                    <option value="">Select Chapter</option>
+                </select>
+            </div>
+            
+            <div class="form-group flex items-end">
+                <button onclick="generatePrePostQuiz()" class="btn w-full bg-pink-500 hover:bg-pink-600 text-white">
+                    <i class="fas fa-magic"></i> Generate Quizzes
+                </button>
+            </div>
+        </div>
+
+        <!-- Debug/Control Buttons -->
+        <div class="flex space-x-2 mt-4">
+            <button onclick="debugFetchBooks()" class="btn bg-gray-500 hover:bg-gray-600 text-white text-xs">
+                🔍 Refresh Books
+            </button>
+            <button onclick="fetchChaptersForPrePost()" class="btn bg-gray-500 hover:bg-gray-600 text-white text-xs">
+                🔄 Refresh Chapters
+            </button>
+        </div>
+        <!-- Success Message -->
+        <p id="quizGenerationMessage" class="hidden text-green-500 font-semibold mt-4"></p>
+        
+        <!-- New Tabbed Quiz Display Section -->
+        <div id="tabbed-quiz-container" class="hidden mt-6">
+            <!-- Quiz IDs Display -->
+            <div class="p-3 bg-green-50 border border-green-200 rounded-md mb-4 flex items-center">
+                <span class="text-green-600 mr-2"><i class="fas fa-check-circle"></i></span>
+              
+            </div>
+            
+            <!-- Tabs -->
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px" aria-label="Tabs">
+                    <button id="pre-assessment-tab" onclick="showQuizTab('pre')" class="text-blue-600 border-blue-600 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                        Pre Assessment
+                    </button>
+                    <button id="post-assessment-tab" onclick="showQuizTab('post')" class="text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 border-transparent font-medium text-sm">
+                        Post Assessment
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Tab Content -->
+            <div id="quiz-tab-content" class="py-6">
+                <div id="pre-content" class="quiz-tab-panel">
+                    <div id="pre-questions-container" class="space-y-4">
+                        <p class="text-center text-gray-500">Loading pre-assessment questions...</p>
+                    </div>
+                </div>
+                <div id="post-content" class="quiz-tab-panel hidden">
+                    <div id="post-questions-container" class="space-y-4">
+                        <p class="text-center text-gray-500">Loading post-assessment questions...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Original Quiz Questions Display Section (will be hidden when using the tabbed interface) -->
+        <div id="quizQuestionsContainer" class="hidden mt-6 p-6 bg-white rounded-lg shadow-lg border">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Quiz Questions</h3>
+            <div class="form-group">
+                <label class="form-label">Select Quiz:</label>
+                <select id="quizSelect" class="form-control form-select">
+                    <option value="">Select Quiz</option>
+                </select>
+            </div>
+            <button onclick="fetchQuizQuestions()" class="btn bg-blue-500 hover:bg-blue-600 text-white mt-2">
+                🔍 Show Questions
+            </button>
+            <div id="quizQuestionsList" class="mt-4 space-y-3"></div>
+        </div>
+    </div>
+
+
+    <!-- Add this just before the closing div of the pre-post tab -->
+<!-- Previous Assessment Sets Table -->
+<div class="mt-8 gradient-card">
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">Previous Assessment Sets</h3>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Set ID</th>
+                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Set Name</th>
+                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Created</th>
+                    <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200" id="previous-assessment-sets">
+                <!-- Dummy data will be inserted by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal for viewing set questions -->
+<div id="assessment-set-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="border-b px-6 py-4 flex justify-between items-center bg-indigo-50">
+            <h3 class="text-xl font-bold text-indigo-700" id="modal-title">Assessment Set Details</h3>
+            <button onclick="closeAssessmentSetModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="p-6">
+            <!-- Set Information -->
+            <div class="p-3 bg-blue-50 rounded-md mb-4">
+                <p class="text-sm text-blue-700" id="modal-details">
+                    <span class="font-medium">Set Details:</span>
+                    <span id="modal-class"></span> | 
+                    <span id="modal-subject"></span> | 
+                    <span id="modal-book"></span> | 
+                    <span id="modal-date"></span>
+                </p>
+            </div>
+            
+            <!-- Tabs for Pre and Post Assessment -->
+            <div class="border-b border-gray-200">
+                <nav class="flex -mb-px" aria-label="Tabs">
+                    <button id="modal-pre-tab" onclick="showModalTab('pre')" class="text-blue-600 border-blue-600 whitespace-nowrap py-4 px-4 border-b-2 font-medium text-sm">
+                        Pre Assessment Questions
+                    </button>
+                    <button id="modal-post-tab" onclick="showModalTab('post')" class="text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-4 border-b-2 border-transparent font-medium text-sm">
+                        Post Assessment Questions
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="py-6">
+                <div id="modal-pre-content" class="modal-tab-panel">
+                    <div id="modal-pre-questions" class="space-y-4">
+                        <!-- Pre assessment questions will be inserted here -->
+                    </div>
+                </div>
+                <div id="modal-post-content" class="modal-tab-panel hidden">
+                    <div id="modal-post-questions" class="space-y-4">
+                        <!-- Post assessment questions will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="border-t px-6 py-4 flex justify-end bg-gray-50">
+            <button onclick="downloadAssessmentSet()" class="btn bg-green-500 hover:bg-green-600 text-white mr-2">
+                <i class="fas fa-download mr-1"></i> Download Set
+            </button>
+            <button onclick="closeAssessmentSetModal()" class="btn bg-gray-500 hover:bg-gray-600 text-white">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sample data for previous assessment sets
+const previousAssessmentSets = [
+    { id: "AS001", name: "Algebra Fundamentals", class: "10th", subject: "Mathematics", book: "Advanced Algebra", dateCreated: "2025-04-15" },
+    { id: "AS002", name: "Chemical Bonds", class: "9th", subject: "Chemistry", book: "General Chemistry", dateCreated: "2025-04-12" },
+    { id: "AS003", name: "Grammar Basics", class: "8th", subject: "English", book: "English Grammar", dateCreated: "2025-04-10" },
+    { id: "AS004", name: "World History", class: "11th", subject: "History", book: "Modern World History", dateCreated: "2025-04-08" },
+    { id: "AS005", name: "Fractions", class: "7th", subject: "Mathematics", book: "Basic Mathematics", dateCreated: "2025-04-05" }
+];
+
+// Sample questions for each assessment set
+const assessmentSetQuestions = {
+    "AS001": {
+        pre: [
+            { id: 1, text: "What is the value of x in the equation 2x + 5 = 13?", options: ["x = 3", "x = 4", "x = 5", "x = 6"], correct: "x = 4" },
+            { id: 2, text: "Simplify the expression 3x² - 2x + 5x - 8", options: ["3x² + 3x - 8", "3x² - 7x - 8", "3x² + 3x + 8", "3x² + 7x - 8"], correct: "3x² + 3x - 8" },
+            { id: 3, text: "Solve for y: 4y - 7 = 9", options: ["y = 4", "y = 4.5", "y = 5", "y = 4.25"], correct: "y = 4" },
+            { id: 4, text: "Factor the expression x² - 9", options: ["(x+3)(x-3)", "(x-3)(x-3)", "(x+3)(x+3)", "Cannot be factored"], correct: "(x+3)(x-3)" },
+            { id: 5, text: "If f(x) = 2x + 3, what is f(4)?", options: ["7", "8", "11", "14"], correct: "11" }
+        ],
+        post: [
+            { id: 1, text: "What is the value of x in the equation 3x - 7 = 20?", options: ["x = 9", "x = 8", "x = 10", "x = 27/3"], correct: "x = 9" },
+            { id: 2, text: "Simplify the expression 2x² - 5x + 8x - 12", options: ["2x² + 3x - 12", "2x² - 13x - 12", "2x² + 13x - 12", "2x² + 3x + 12"], correct: "2x² + 3x - 12" },
+            { id: 3, text: "Solve for y: 5y + 8 = 28", options: ["y = 4", "y = 5", "y = 6", "y = 7"], correct: "y = 4" },
+            { id: 4, text: "Factor the expression x² - 16", options: ["(x+4)(x-4)", "(x-4)(x-4)", "(x+8)(x-2)", "Cannot be factored"], correct: "(x+4)(x-4)" },
+            { id: 5, text: "If f(x) = 3x - 2, what is f(5)?", options: ["8", "10", "13", "17"], correct: "13" }
+        ]
+    },
+    "AS002": {
+        pre: [
+            { id: 1, text: "What is a covalent bond?", options: [
+                "A bond formed by sharing electrons", 
+                "A bond formed by transferring electrons", 
+                "A bond formed by magnetic attraction", 
+                "A bond formed by nuclear forces"
+            ], correct: "A bond formed by sharing electrons" },
+            { id: 2, text: "Which of these is an ionic compound?", options: ["NaCl", "H₂O", "CH₄", "CO₂"], correct: "NaCl" },
+            { id: 3, text: "What is the bond angle in a water molecule?", options: ["104.5°", "109.5°", "120°", "180°"], correct: "104.5°" }
+        ],
+        post: [
+            { id: 1, text: "What type of bonding occurs in HCl?", options: [
+                "Pure covalent", 
+                "Polar covalent", 
+                "Ionic", 
+                "Metallic"
+            ], correct: "Polar covalent" },
+            { id: 2, text: "What causes the polarity in a covalent bond?", options: [
+                "Difference in electronegativity", 
+                "Number of valence electrons", 
+                "Atomic size", 
+                "Nuclear charge"
+            ], correct: "Difference in electronegativity" },
+            { id: 3, text: "Which molecule has a tetrahedral geometry?", options: ["CH₄", "NH₃", "H₂O", "CO₂"], correct: "CH₄" }
+        ]
+    },
+    "AS003": {
+        pre: [
+            { id: 1, text: "What is the correct use of 'their'?", options: [
+                "They're going to the store", 
+                "I left my book over their", 
+                "Their books are on the table", 
+                "The book is there"
+            ], correct: "Their books are on the table" },
+            { id: 2, text: "Which sentence uses correct subject-verb agreement?", options: [
+                "The team are playing well", 
+                "The team is playing well", 
+                "The team were playing well", 
+                "The team be playing well"
+            ], correct: "The team is playing well" }
+        ],
+        post: [
+            { id: 1, text: "Identify the dependent clause: 'When it rains, the plants grow.'", options: [
+                "When it rains", 
+                "the plants grow", 
+                "When it", 
+                "the plants"
+            ], correct: "When it rains" },
+            { id: 2, text: "Which sentence is punctuated correctly?", options: [
+                "John, who is my friend, lives in New York.", 
+                "John who is my friend lives in New York.", 
+                "John who is my friend, lives in New York.", 
+                "John, who is my friend lives in New York."
+            ], correct: "John, who is my friend, lives in New York." }
+        ]
+    },
+    "AS004": {
+        pre: [
+            { id: 1, text: "When did World War I begin?", options: ["1914", "1915", "1916", "1917"], correct: "1914" },
+            { id: 2, text: "Which country was NOT part of the Allies in World War II?", options: [
+                "United States", 
+                "Soviet Union", 
+                "Germany", 
+                "United Kingdom"
+            ], correct: "Germany" }
+        ],
+        post: [
+            { id: 1, text: "What treaty ended World War I?", options: [
+                "Treaty of Versailles", 
+                "Treaty of Paris", 
+                "Treaty of London", 
+                "Treaty of Berlin"
+            ], correct: "Treaty of Versailles" },
+            { id: 2, text: "Which of these events directly led to the US entering World War II?", options: [
+                "Attack on Pearl Harbor", 
+                "Fall of France", 
+                "Battle of Britain", 
+                "D-Day invasion"
+            ], correct: "Attack on Pearl Harbor" }
+        ]
+    },
+    "AS005": {
+        pre: [
+            { id: 1, text: "What is 1/4 + 1/2?", options: ["3/4", "2/6", "1/6", "3/6"], correct: "3/4" },
+            { id: 2, text: "What is 2/3 × 3/4?", options: ["5/7", "6/7", "1/2", "5/12"], correct: "1/2" }
+        ],
+        post: [
+            { id: 1, text: "What is 3/8 + 5/8?", options: ["8/8", "8/16", "1", "5/3"], correct: "1" },
+            { id: 2, text: "What is 2/5 ÷ 1/10?", options: ["1/2", "4", "2/50", "20/5"], correct: "4" }
+        ]
+    }
+};
+
+// Function to populate the previous assessment sets table
+function populatePreviousAssessmentSets() {
+    const tableBody = document.getElementById('previous-assessment-sets');
+    
+    // Clear existing content
+    tableBody.innerHTML = '';
+    
+    // Add rows for each assessment set
+    previousAssessmentSets.forEach((set, index) => {
+        const row = document.createElement('tr');
+        row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        
+        row.innerHTML = `
+            <td class="py-3 px-4 text-sm text-gray-900">${set.id}</td>
+            <td class="py-3 px-4 text-sm text-gray-900">${set.name}</td>
+            <td class="py-3 px-4 text-sm text-gray-900">${set.class}</td>
+            <td class="py-3 px-4 text-sm text-gray-900">${set.subject}</td>
+            <td class="py-3 px-4 text-sm text-gray-900">${set.dateCreated}</td>
+            <td class="py-3 px-4 text-sm">
+                <button onclick="viewAssessmentSet('${set.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                    View
+                </button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Function to view assessment set questions in the modal
+function viewAssessmentSet(setId) {
+    // Find the selected assessment set
+    const selectedSet = previousAssessmentSets.find(set => set.id === setId);
+    if (!selectedSet) return;
+    
+    // Get the questions for this set
+    const questions = assessmentSetQuestions[setId];
+    if (!questions) return;
+    
+    // Update modal title and details
+    document.getElementById('modal-title').textContent = `${selectedSet.name} (${selectedSet.id})`;
+    document.getElementById('modal-class').textContent = selectedSet.class;
+    document.getElementById('modal-subject').textContent = selectedSet.subject;
+    document.getElementById('modal-book').textContent = selectedSet.book;
+    document.getElementById('modal-date').textContent = `Created: ${selectedSet.dateCreated}`;
+    
+    // Populate pre-assessment questions
+    populateModalQuestions('modal-pre-questions', questions.pre);
+    
+    // Populate post-assessment questions
+    populateModalQuestions('modal-post-questions', questions.post);
+    
+    // Show pre-assessment tab by default
+    showModalTab('pre');
+    
+    // Show the modal
+    document.getElementById('assessment-set-modal').classList.remove('hidden');
+}
+
+// Function to populate questions in the modal
+function populateModalQuestions(containerId, questions) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    questions.forEach((question, index) => {
+        const questionElement = document.createElement('div');
+        questionElement.className = 'p-4 bg-white border border-gray-200 rounded-lg shadow-sm';
+        
+        let optionsHtml = '';
+        question.options.forEach((option, optIndex) => {
+            const isCorrect = option === question.correct;
+            optionsHtml += `
+                <div class="flex items-center mt-2">
+                    <span class="inline-flex items-center justify-center h-5 w-5 rounded-full ${isCorrect ? 'bg-green-500' : 'bg-gray-200'} mr-3">
+                        ${isCorrect ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
+                    </span>
+                    <span class="${isCorrect ? 'font-medium' : ''}">${option}</span>
+                </div>
+            `;
+        });
+        
+        questionElement.innerHTML = `
+            <div class="flex justify-between">
+                <span class="font-medium text-gray-700">Question ${index + 1}</span>
+                <span class="text-xs text-gray-500">(ID: ${question.id})</span>
+            </div>
+            <p class="mt-2 text-gray-800">${question.text}</p>
+            <div class="mt-3">
+                <div class="text-sm text-gray-500 mb-1">Options:</div>
+                ${optionsHtml}
+            </div>
+        `;
+        
+        container.appendChild(questionElement);
+    });
+}
+
+// Function to switch between pre and post tabs in the modal
+function showModalTab(tabType) {
+    // Update tab buttons
+    document.getElementById('modal-pre-tab').classList.remove('text-blue-600', 'border-blue-600');
+    document.getElementById('modal-pre-tab').classList.add('text-gray-500', 'border-transparent');
+    document.getElementById('modal-post-tab').classList.remove('text-blue-600', 'border-blue-600');
+    document.getElementById('modal-post-tab').classList.add('text-gray-500', 'border-transparent');
+    
+    // Hide all tab content
+    document.querySelectorAll('.modal-tab-panel').forEach(panel => {
+        panel.classList.add('hidden');
+    });
+    
+    if (tabType === 'pre') {
+        document.getElementById('modal-pre-tab').classList.remove('text-gray-500', 'border-transparent');
+        document.getElementById('modal-pre-tab').classList.add('text-blue-600', 'border-blue-600');
+        document.getElementById('modal-pre-content').classList.remove('hidden');
+    } else {
+        document.getElementById('modal-post-tab').classList.remove('text-gray-500', 'border-transparent');
+        document.getElementById('modal-post-tab').classList.add('text-blue-600', 'border-blue-600');
+        document.getElementById('modal-post-content').classList.remove('hidden');
+    }
+}
+
+// Function to close the modal
+function closeAssessmentSetModal() {
+    document.getElementById('assessment-set-modal').classList.add('hidden');
+}
+
+// Function to download assessment set
+function downloadAssessmentSet() {
+    const title = document.getElementById('modal-title').textContent;
+    alert(`Downloading ${title}...`);
+    // In a real implementation, this would generate and download a file
+}
+
+// Initialize the previous assessment sets table when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Populate the previous assessment sets table immediately
+    populatePreviousAssessmentSets();
+    
+    // Update the generatePrePostQuiz function to also refresh the previous assessment sets table
+    const originalGeneratePrePostQuiz = window.generatePrePostQuiz;
+    if (typeof originalGeneratePrePostQuiz === 'function') {
+        window.generatePrePostQuiz = function() {
+            // Call the original function
+            originalGeneratePrePostQuiz();
+            
+            // After generating a new quiz, update the previous assessment sets
+            setTimeout(function() {
+                populatePreviousAssessmentSets();
+            }, 500);
+        };
+    }
+});
+</script>
+
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get references to the dropdown elements
+        const bookDropdown = document.getElementById('prePostBook');
+        const chapterDropdown = document.getElementById('prePostChapter');
+        
+        // Book dropdown click handler
+        bookDropdown.addEventListener('mousedown', function(event) {
+            // Check if the dropdown is empty (only has the default option)
+            if (this.options.length <= 1) {
+                event.preventDefault(); // Prevent the dropdown from opening
+                alert('Please click on "Refresh Books" button first to load available books.');
+            }
+        });
+        
+        // Chapter dropdown click handler
+        chapterDropdown.addEventListener('mousedown', function(event) {
+            // Check if the dropdown is empty (only has the default option)
+            if (this.options.length <= 1) {
+                event.preventDefault(); // Prevent the dropdown from opening
+                alert('Please click on "Refresh Chapters" button first to load available chapters.');
+            }
+        });
+    });
+    </script>
+
+
+
+<script>
+    // Function to show quiz tab content
+    function showQuizTab(tabType) {
+        // Update tab buttons
+        document.getElementById('pre-assessment-tab').classList.remove('text-blue-600', 'border-blue-600');
+        document.getElementById('pre-assessment-tab').classList.add('text-gray-500', 'border-transparent');
+        document.getElementById('post-assessment-tab').classList.remove('text-blue-600', 'border-blue-600');
+        document.getElementById('post-assessment-tab').classList.add('text-gray-500', 'border-transparent');
+        
+        if (tabType === 'pre') {
+            document.getElementById('pre-assessment-tab').classList.remove('text-gray-500', 'border-transparent');
+            document.getElementById('pre-assessment-tab').classList.add('text-blue-600', 'border-blue-600');
+            document.getElementById('pre-content').classList.remove('hidden');
+            document.getElementById('post-content').classList.add('hidden');
+        } else {
+            document.getElementById('post-assessment-tab').classList.remove('text-gray-500', 'border-transparent');
+            document.getElementById('post-assessment-tab').classList.add('text-blue-600', 'border-blue-600');
+            document.getElementById('pre-content').classList.add('hidden');
+            document.getElementById('post-content').classList.remove('hidden');
+        }
+    }
+    
+    // Store the original functions to ensure we're not losing functionality
+    const originalGeneratePrePostQuiz = window.generatePrePostQuiz;
+    const originalFetchQuizQuestions = window.fetchQuizQuestions;
+    
+    // Override the generatePrePostQuiz function to work with our new tabbed interface
+    window.generatePrePostQuiz = function() {
+        // Call original function first to maintain existing functionality
+        if (typeof originalGeneratePrePostQuiz === 'function') {
+            originalGeneratePrePostQuiz();
+        }
+        
+        // Show our tabbed container
+        document.getElementById('tabbed-quiz-container').classList.remove('hidden');
+        
+        // Get the quiz select dropdown after it's been populated
+        const quizSelect = document.getElementById('quizSelect');
+        
+        // Monitor for changes to the quiz select dropdown
+        const observer = new MutationObserver(function(mutations) {
+            // Check if options have been added
+            if (quizSelect.options.length > 1) {
+                // Extract quiz IDs from options
+                let preQuizId = null;
+                let postQuizId = null;
+                
+                for (let i = 0; i < quizSelect.options.length; i++) {
+                    const optionText = quizSelect.options[i].text;
+                    if (optionText.toLowerCase().includes('pre')) {
+                        preQuizId = quizSelect.options[i].value;
+                    } else if (optionText.toLowerCase().includes('post')) {
+                        postQuizId = quizSelect.options[i].value;
+                    }
+                }
+                
+                // Update the quiz IDs in our display
+                if (preQuizId) document.getElementById('pre-quiz-id').textContent = preQuizId;
+                if (postQuizId) document.getElementById('post-quiz-id').textContent = postQuizId;
+                
+                // Disconnect the observer once we've processed the options
+                observer.disconnect();
+            }
+        });
+        
+        // Start observing the quiz select dropdown
+        observer.observe(quizSelect, { childList: true });
+    };
+    
+    // Override the fetchQuizQuestions function to populate our tabbed interface
+    window.fetchQuizQuestions = function() {
+        // Get the quiz select value before calling the original function
+        const quizSelect = document.getElementById('quizSelect');
+        const selectedQuizType = quizSelect.options[quizSelect.selectedIndex].text.toLowerCase();
+        const isPreQuiz = selectedQuizType.includes('pre');
+        
+        // Call original function to fetch questions using existing code
+        if (typeof originalFetchQuizQuestions === 'function') {
+            originalFetchQuizQuestions();
+        }
+        
+        // Wait a short time for the original function to update the DOM
+        setTimeout(function() {
+            // Get the questions HTML from the original container
+            const questionsHTML = document.getElementById('quizQuestionsList').innerHTML;
+            
+            // Update the appropriate tab content
+            if (isPreQuiz) {
+                document.getElementById('pre-questions-container').innerHTML = questionsHTML;
+                showQuizTab('pre');
+            } else {
+                document.getElementById('post-questions-container').innerHTML = questionsHTML;
+                showQuizTab('post');
+            }
+        }, 300); // Allow time for DOM updates
+    };
+    
+    // Function to programmatically select and load a quiz
+    function loadQuizByType(type) {
+        const quizSelect = document.getElementById('quizSelect');
+        for (let i = 0; i < quizSelect.options.length; i++) {
+            const optionText = quizSelect.options[i].text.toLowerCase();
+            if ((type === 'pre' && optionText.includes('pre')) || 
+                (type === 'post' && optionText.includes('post'))) {
+                quizSelect.selectedIndex = i;
+                break;
+            }
+        }
+        
+        // Call the fetch function to load questions
+        fetchQuizQuestions();
+    }
+    
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        // Override click behaviors for the tabs
+        document.getElementById('pre-assessment-tab').addEventListener('click', function(e) {
+            e.preventDefault();
+            loadQuizByType('pre');
+        });
+        
+        document.getElementById('post-assessment-tab').addEventListener('click', function(e) {
+            e.preventDefault();
+            loadQuizByType('post');
+        });
+    });
+</script>
+
+
+    
+    
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+    <script>
+        // File input label update
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const fileLabel = document.querySelector('.file-input-label');
+            
+            if (fileInput && fileLabel) {
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length > 0) {
+                        fileLabel.innerHTML = '<i class="fas fa-file"></i> ' + fileInput.files[0].name;
+                    } else {
+                        fileLabel.innerHTML = '<i class="fas fa-upload"></i> Choose File';
+                    }
+                });
+            }
+        });
+
+        // Tab Functionality
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked sidebar item
+            event.currentTarget.classList.add('active');
+        }
+
+        function compareQuizzes() {
+            let prePin = document.getElementById("preTrainingPin").value;
+            let postPin = document.getElementById("postTrainingPin").value;
+        
+            if (!prePin || !postPin) {
+                alert("⚠️ Please enter both Game PINs for comparison!");
+                return;
+            }
+        
+            fetch(`/compare_training?pre_pin=${prePin}&post_pin=${postPin}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update UI with the fetched success rates
+                    document.getElementById("preSuccessRate").textContent = data.success_rate.pre.toFixed(2);
+                    document.getElementById("postSuccessRate").textContent = data.success_rate.post.toFixed(2);
+        
+                    // Improvement Message
+                    let improvement = data.success_rate.post - data.success_rate.pre;
+                    let message = improvement > 0 
+                        ? `Improvement of ${improvement.toFixed(2)}%! Great progress!` 
+                        : `No improvement detected. Consider revising training materials.`;
+                    
+                    document.getElementById("improvementMessage").textContent = message;
+        
+                    // Show Results Box
+                    document.getElementById("comparisonResults").classList.remove("hidden");
+        
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => console.error("Error fetching training data:", error));
+        }
+
+
+
+
+
+
+    // Assignment Summary functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener to the Assignment Summary button
+    const assignmentSummaryButton = document.querySelector('button[onclick*="assignment-summary"]');
+    if (assignmentSummaryButton) {
+        assignmentSummaryButton.onclick = function(event) {
+            showAssignmentSummary();
+            event.preventDefault(); // Prevent default behavior
+        };
+    }
+});
+
+function showAssignmentSummary() {
+    console.log("Assignment Summary function called");
+    
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+        tab.style.display = 'none';
+    });
+    
+    // Show the assignment summary tab
+    const assignmentSummaryTab = document.getElementById('assignment-summary');
+    assignmentSummaryTab.style.display = 'block';
+    assignmentSummaryTab.classList.add('active');
+    
+    // Add active class to the sidebar button
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to the assignment summary button
+    document.querySelector('button[onclick*="assignment-summary"]').classList.add('active');
+    
+    // Generate mock data for the assignment summary
+    generateMockQuizData();
+}
+
+// Generate mock data for the last 10 quizzes
+function generateMockQuizData() {
+    console.log("Generating mock quiz data");
+    const quizListContainer = document.getElementById("quizListContainer");
+    if (!quizListContainer) {
+        console.error("quizListContainer not found");
+        return;
+    }
+    
+    quizListContainer.innerHTML = ""; // Clear previous content
+    
+    // Mock data for 10 quizzes
+    const mockQuizzes = [
+        { id: "Q001", title: "Mathematics Class 8 - Algebra", date: "2025-03-28", time: "10:00 AM", slot: "1" },
+        { id: "Q002", title: "Science Class 6 - Solar System", date: "2025-03-27", time: "11:30 AM", slot: "2" },
+        { id: "Q003", title: "English Class 5 - Grammar", date: "2025-03-26", time: "09:15 AM", slot: "1" },
+        { id: "Q004", title: "Social Science Class 9 - History", date: "2025-03-25", time: "02:00 PM", slot: "3" },
+        { id: "Q005", title: "Hindi Class 7 - Vocabulary", date: "2025-03-24", time: "10:45 AM", slot: "2" },
+        { id: "Q006", title: "Mathematics Class 10 - Trigonometry", date: "2025-03-21", time: "01:30 PM", slot: "3" },
+        { id: "Q007", title: "Science Class 8 - Chemistry", date: "2025-03-20", time: "11:00 AM", slot: "2" },
+        { id: "Q008", title: "English Class 6 - Literature", date: "2025-03-19", time: "09:30 AM", slot: "1" },
+        { id: "Q009", title: "Social Science Class 5 - Geography", date: "2025-03-18", time: "03:15 PM", slot: "4" },
+        { id: "Q010", title: "Hindi Class 9 - Poetry", date: "2025-03-17", time: "02:45 PM", slot: "4" }
+    ];
+    
+    // Create a container for the quiz list
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'overflow-x-auto';
+    
+    // Create a table for the quizzes
+    const table = document.createElement('table');
+    table.className = 'min-w-full bg-white rounded-lg overflow-hidden';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    thead.className = 'bg-gray-100';
+    thead.innerHTML = `
+        <tr>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quiz ID</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slot</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+        </tr>
+    `;
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    tbody.className = 'divide-y divide-gray-200';
+    
+    // Add quiz rows
+    mockQuizzes.forEach((quiz, index) => {
+        const row = document.createElement('tr');
+        row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        
+        row.innerHTML = `
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.id}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.title}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.date}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.time}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.slot}</td>
+            <td class="py-4 px-4 text-sm">
+                <button onclick="viewQuizSummary('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                    View Summary
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Assemble the table
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+    quizListContainer.appendChild(tableContainer);
+    
+    console.log("Mock quiz data generated and appended to container");
+}
+
+// Function to handle viewing a quiz summary
+function viewQuizSummary(quizId) {
+    alert(`Viewing summary for Quiz ID: ${quizId}\nThis would navigate to a detailed summary page for this quiz.`);
+    // In a real implementation, this would navigate to a quiz summary page
+    // window.location.href = `/quiz_summary/${quizId}`;
+}
+
+// Override the showTab function to handle the assignment summary tab specially
+
+// Function to handle viewing a quiz summary
+function viewQuizSummary(quizId) {
+    console.log(`Viewing summary for Quiz ID: ${quizId}`);
+    
+    // Find the quiz data based on quizId
+    const quiz = mockQuizzes.find(q => q.id === quizId);
+    if (!quiz) {
+        alert("Quiz not found!");
+        return;
+    }
+    
+    // Generate mock data for this quiz
+    const quizData = generateMockQuizAnalytics(quizId);
+    
+    // Create modal container if it doesn't exist
+    let modalContainer = document.getElementById('quizSummaryModal');
+    if (!modalContainer) {
+        modalContainer = document.createElement('div');
+        modalContainer.id = 'quizSummaryModal';
+        modalContainer.className = 'fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50';
+        document.body.appendChild(modalContainer);
+    }
+    
+    // Set modal content
+    modalContainer.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-6xl max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="border-b px-6 py-4 flex justify-between items-center bg-indigo-50">
+                <h3 class="text-xl font-bold text-indigo-700">${quiz.title} (${quiz.id}) - Summary</h3>
+                <button onclick="closeQuizSummaryModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="p-6">
+                <!-- Quiz Information -->
+                <div class="flex flex-wrap -mx-2 mb-6">
+                    <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="gradient-card h-full">
+                            <h4 class="text-lg font-semibold text-indigo-600 mb-2">Quiz Details</h4>
+                            <p><span class="font-medium">Date:</span> ${quiz.date}</p>
+                            <p><span class="font-medium">Time:</span> ${quiz.time}</p>
+                            <p><span class="font-medium">Slot:</span> ${quiz.slot}</p>
+                            <p><span class="font-medium">Total Questions:</span> ${quizData.totalQuestions}</p>
+                            <p><span class="font-medium">Participants:</span> ${quizData.participants}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="gradient-card h-full">
+                            <h4 class="text-lg font-semibold text-green-600 mb-2">Performance Metrics</h4>
+                            <p><span class="font-medium">Average Score:</span> ${quizData.averageScore}%</p>
+                            <p><span class="font-medium">Highest Score:</span> ${quizData.highestScore}%</p>
+                            <p><span class="font-medium">Lowest Score:</span> ${quizData.lowestScore}%</p>
+                            <p><span class="font-medium">Completion Rate:</span> ${quizData.completionRate}%</p>
+                            <p><span class="font-medium">Average Time:</span> ${quizData.averageTime} min</p>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/3 px-2 mb-4">
+                        <div class="gradient-card h-full">
+                            <h4 class="text-lg font-semibold text-amber-600 mb-2">Difficulty Analysis</h4>
+                            <p><span class="font-medium">Easy Questions:</span> ${quizData.difficultyBreakdown.easy}%</p>
+                            <p><span class="font-medium">Medium Questions:</span> ${quizData.difficultyBreakdown.medium}%</p>
+                            <p><span class="font-medium">Hard Questions:</span> ${quizData.difficultyBreakdown.hard}%</p>
+                            <p><span class="font-medium">Avg. Attempts per Question:</span> ${quizData.avgAttemptsPerQuestion}</p>
+                            <p><span class="font-medium">Most Challenging:</span> Q${quizData.mostChallengingQuestion}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Row -->
+                <div class="flex flex-wrap -mx-2 mb-6">
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="gradient-card">
+                            <h4 class="text-lg font-semibold text-blue-600 mb-2">Score Distribution</h4>
+                            <div class="h-64">
+                                <canvas id="scoreDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="gradient-card">
+                            <h4 class="text-lg font-semibold text-purple-600 mb-2">Question Performance</h4>
+                            <div class="h-64">
+                                <canvas id="questionPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- More Charts Row -->
+                <div class="flex flex-wrap -mx-2 mb-6">
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="gradient-card">
+                            <h4 class="text-lg font-semibold text-pink-600 mb-2">Time Spent per Question</h4>
+                            <div class="h-64">
+                                <canvas id="timeSpentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/2 px-2 mb-4">
+                        <div class="gradient-card">
+                            <h4 class="text-lg font-semibold text-teal-600 mb-2">Completion Timeline</h4>
+                            <div class="h-64">
+                                <canvas id="completionTimelineChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Question-by-Question Analysis -->
+                <div class="gradient-card">
+                    <h4 class="text-lg font-semibold text-gray-700 mb-4">Question-by-Question Analysis</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-2 px-4 text-left">Question #</th>
+                                    <th class="py-2 px-4 text-left">Topic</th>
+                                    <th class="py-2 px-4 text-left">Success Rate</th>
+                                    <th class="py-2 px-4 text-left">Avg. Time</th>
+                                    <th class="py-2 px-4 text-left">Difficulty</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${quizData.questionAnalysis.map((q, index) => `
+                                    <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                        <td class="py-2 px-4">Question ${q.number}</td>
+                                        <td class="py-2 px-4">${q.topic}</td>
+                                        <td class="py-2 px-4">
+                                            <div class="flex items-center">
+                                                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: ${q.successRate}%"></div>
+                                                </div>
+                                                <span class="ml-2">${q.successRate}%</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-2 px-4">${q.avgTime} sec</td>
+                                        <td class="py-2 px-4">
+                                            <span class="px-2 py-1 rounded text-xs text-white 
+                                                ${q.difficulty === 'Easy' ? 'bg-green-500' : 
+                                                  q.difficulty === 'Medium' ? 'bg-yellow-500' : 'bg-red-500'}">
+                                                ${q.difficulty}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal Footer -->
+            <div class="border-t px-6 py-4 flex justify-end bg-gray-50">
+                <button onclick="downloadPDF('${quizId}')" class="btn bg-green-500 hover:bg-green-600 text-white mr-2">
+                    <i class="fas fa-download mr-1"></i> Download Report
+                </button>
+                <button onclick="closeQuizSummaryModal()" class="btn bg-gray-500 hover:bg-gray-600 text-white">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Show the modal
+    modalContainer.style.display = 'flex';
+    
+    // Initialize charts after modal is visible
+    setTimeout(() => {
+        initializeCharts(quizData);
+    }, 100);
+}
+
+// Function to close the quiz summary modal
+function closeQuizSummaryModal() {
+    const modalContainer = document.getElementById('quizSummaryModal');
+    if (modalContainer) {
+        modalContainer.style.display = 'none';
+    }
+}
+
+// Function to initialize charts
+function initializeCharts(quizData) {
+    // Score Distribution Chart
+    const scoreCtx = document.getElementById('scoreDistributionChart').getContext('2d');
+    new Chart(scoreCtx, {
+        type: 'bar',
+        data: {
+            labels: ['0-20%', '21-40%', '41-60%', '61-80%', '81-100%'],
+            datasets: [{
+                label: 'Number of Students',
+                data: quizData.scoreDistribution,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 159, 64, 0.7)',
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(54, 162, 235, 0.7)'
+                ],
+                borderColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 159, 64)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(54, 162, 235)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    // Question Performance Chart
+    const questionCtx = document.getElementById('questionPerformanceChart').getContext('2d');
+    new Chart(questionCtx, {
+        type: 'bar',
+        data: {
+            labels: quizData.questionAnalysis.map(q => `Q${q.number}`),
+            datasets: [{
+                label: 'Success Rate (%)',
+                data: quizData.questionAnalysis.map(q => q.successRate),
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgb(75, 192, 192)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Success Rate (%)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Time Spent per Question Chart
+    const timeCtx = document.getElementById('timeSpentChart').getContext('2d');
+    new Chart(timeCtx, {
+        type: 'line',
+        data: {
+            labels: quizData.questionAnalysis.map(q => `Q${q.number}`),
+            datasets: [{
+                label: 'Average Time (seconds)',
+                data: quizData.questionAnalysis.map(q => q.avgTime),
+                fill: false,
+                backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                borderColor: 'rgb(153, 102, 255)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Time (seconds)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Completion Timeline Chart
+    const completionCtx = document.getElementById('completionTimelineChart').getContext('2d');
+    new Chart(completionCtx, {
+        type: 'line',
+        data: {
+            labels: ['0%', '20%', '40%', '60%', '80%', '100%'],
+            datasets: [{
+                label: 'Number of Participants',
+                data: quizData.completionTimeline,
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Participants'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Quiz Completion Percentage'
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Function to generate mock data for quiz analytics
+function generateMockQuizAnalytics(quizId) {
+    // Parse quiz ID to get a consistent but pseudo-random seed
+    const seed = parseInt(quizId.replace('Q', ''));
+    
+    // Helper function to get a "random" number based on seed and range
+    const getRandomNumber = (min, max, offset = 0) => {
+        return Math.floor(((seed * 9301 + 49297) % 233280) / 233280 * (max - min + 1) + min + offset) % (max + 1);
+    };
+    
+    // Total number of questions
+    const totalQuestions = 10;
+    
+    // Generate question analysis data
+    const questionAnalysis = [];
+    const topics = ['Algebra', 'Geometry', 'Statistics', 'Probability', 'Arithmetic', 'Calculus', 'Trigonometry'];
+    const difficulties = ['Easy', 'Medium', 'Hard'];
+    
+    for (let i = 1; i <= totalQuestions; i++) {
+        const topicIndex = (seed + i) % topics.length;
+        const difficultyIndex = Math.floor((seed + i * 3) % 3);
+        
+        questionAnalysis.push({
+            number: i,
+            topic: topics[topicIndex],
+            successRate: getRandomNumber(30, 95, i * 3),
+            avgTime: getRandomNumber(15, 90, i * 5),
+            difficulty: difficulties[difficultyIndex]
+        });
+    }
+    
+    // Generate score distribution
+    const scoreDistribution = [
+        getRandomNumber(1, 5),
+        getRandomNumber(3, 8),
+        getRandomNumber(5, 12),
+        getRandomNumber(8, 15),
+        getRandomNumber(4, 10)
+    ];
+    
+    // Calculate total participants
+    const participants = scoreDistribution.reduce((acc, curr) => acc + curr, 0);
+    
+    // Generate completion timeline
+    const completionTimeline = [
+        participants,
+        getRandomNumber(Math.floor(participants * 0.7), participants),
+        getRandomNumber(Math.floor(participants * 0.5), Math.floor(participants * 0.8)),
+        getRandomNumber(Math.floor(participants * 0.3), Math.floor(participants * 0.6)),
+        getRandomNumber(Math.floor(participants * 0.1), Math.floor(participants * 0.4)),
+        getRandomNumber(0, Math.floor(participants * 0.2))
+    ];
+    
+    // Calculate difficulty breakdown
+    const difficultyBreakdown = {
+        easy: getRandomNumber(20, 40),
+        medium: getRandomNumber(30, 50),
+        hard: 0 // Will calculate to ensure sum is 100
+    };
+    difficultyBreakdown.hard = 100 - difficultyBreakdown.easy - difficultyBreakdown.medium;
+    
+    // Find most challenging question
+    const mostChallengingIndex = questionAnalysis.reduce(
+        (iMin, q, i, arr) => q.successRate < arr[iMin].successRate ? i : iMin, 0
+    );
+    
+    return {
+        totalQuestions,
+        participants,
+        averageScore: getRandomNumber(65, 85),
+        highestScore: getRandomNumber(90, 100),
+        lowestScore: getRandomNumber(30, 60),
+        completionRate: getRandomNumber(80, 98),
+        averageTime: getRandomNumber(7, 15) + '.' + getRandomNumber(0, 9),
+        difficultyBreakdown,
+        avgAttemptsPerQuestion: (getRandomNumber(10, 20) / 10).toFixed(1),
+        mostChallengingQuestion: questionAnalysis[mostChallengingIndex].number,
+        scoreDistribution,
+        completionTimeline,
+        questionAnalysis
+    };
+}
+
+// Function to fake downloading a PDF report
+function downloadPDF(quizId) {
+    alert(`Report for Quiz ${quizId} is being prepared for download.`);
+    // In a real implementation, this would generate and download a PDF
+}
+
+// Mock quizzes data (move to global scope so it's accessible)
+const mockQuizzes = [
+    { id: "Q001", title: "Mathematics Class 8 - Algebra", date: "2025-03-28", time: "10:00 AM", slot: "1" },
+    { id: "Q002", title: "Science Class 6 - Solar System", date: "2025-03-27", time: "11:30 AM", slot: "2" },
+    { id: "Q003", title: "English Class 5 - Grammar", date: "2025-03-26", time: "09:15 AM", slot: "1" },
+    { id: "Q004", title: "Social Science Class 9 - History", date: "2025-03-25", time: "02:00 PM", slot: "3" },
+    { id: "Q005", title: "Hindi Class 7 - Vocabulary", date: "2025-03-24", time: "10:45 AM", slot: "2" },
+    { id: "Q006", title: "Mathematics Class 10 - Trigonometry", date: "2025-03-21", time: "01:30 PM", slot: "3" },
+    { id: "Q007", title: "Science Class 8 - Chemistry", date: "2025-03-20", time: "11:00 AM", slot: "2" },
+    { id: "Q008", title: "English Class 6 - Literature", date: "2025-03-19", time: "09:30 AM", slot: "1" },
+    { id: "Q009", title: "Social Science Class 5 - Geography", date: "2025-03-18", time: "03:15 PM", slot: "4" },
+    { id: "Q010", title: "Hindi Class 9 - Poetry", date: "2025-03-17", time: "02:45 PM", slot: "4" }
+];
+
+// Update the generateMockQuizData function to use the global mockQuizzes
+function generateMockQuizData() {
+    console.log("Generating mock quiz data");
+    const quizListContainer = document.getElementById("quizListContainer");
+    if (!quizListContainer) {
+        console.error("quizListContainer not found");
+        return;
+    }
+    
+    quizListContainer.innerHTML = ""; // Clear previous content
+    
+    // Create a container for the quiz list
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'overflow-x-auto';
+    
+    // Create a table for the quizzes
+    const table = document.createElement('table');
+    table.className = 'min-w-full bg-white rounded-lg overflow-hidden';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    thead.className = 'bg-gray-100';
+    thead.innerHTML = `
+        <tr>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quiz ID</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slot</th>
+            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+        </tr>
+    `;
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    tbody.className = 'divide-y divide-gray-200';
+    
+    // Add quiz rows
+    mockQuizzes.forEach((quiz, index) => {
+        const row = document.createElement('tr');
+        row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+        
+        row.innerHTML = `
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.id}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.title}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.date}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.time}</td>
+            <td class="py-4 px-4 text-sm text-gray-900">${quiz.slot}</td>
+            <td class="py-4 px-4 text-sm">
+                <button onclick="viewQuizSummary('${quiz.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded">
+                    View Summary
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Assemble the table
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    tableContainer.appendChild(table);
+    quizListContainer.appendChild(tableContainer);
+    
+    console.log("Mock quiz data generated and appended to container");
+}
+
+
+        // The rest of your JavaScript functions from your original code will be used
+        // These functions remain unchanged since they connect to your existing backend
+    </script>
+
+    <canvas id="successRateChart"></canvas>
+
+
+    
 </body>
 </html>
