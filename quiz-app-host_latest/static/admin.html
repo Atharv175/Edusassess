@@ -813,29 +813,54 @@ body::before {
         </select>
     </div>
 </div>
-
+<!-- Keep your original button -->
 <button onclick="fetchFilteredQuestions()" class="btn w-full bg-blue-500 hover:bg-blue-600 text-white mb-4">
     <i class="fas fa-search"></i> Show Questions
 </button>
 
-<!-- Filtered Questions Display -->
-<div id="questionsContainer" class="mt-4 space-y-3 hidden">
-    <h3 class="text-lg font-semibold text-gray-700">Filtered Questions</h3>
-    <div id="questionsList" class="bg-white p-4 rounded-lg shadow-sm"></div>
-    <div class="mt-4 flex justify-between items-center">
-        <button id="prevPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(-1)">
-            ⬅️ Previous
-        </button>
-        <span id="pageNumber" class="text-gray-600">Page 1</span>
-        <button id="nextPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(1)">
-            Next ➡️
-        </button>
+<!-- Modal Dialog for Questions -->
+<div id="questionsModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex justify-center items-center hidden">
+    <div class="bg-white rounded-lg shadow-xl w-4/5 md:w-3/4 lg:w-2/3 max-h-[90vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b p-4">
+            <h3 class="text-xl font-semibold text-gray-700">Filtered Questions</h3>
+            <button onclick="hideQuestionsModal()" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Modal Body -->
+        <div class="overflow-y-auto p-4 flex-grow">
+            <div id="questionsList" class="space-y-4"></div>
+        </div>
+        
+        <!-- Modal Footer with Pagination -->
+        <div class="border-t p-4 flex justify-between items-center">
+            <button id="prevPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(-1)">
+                ⬅️ Previous
+            </button>
+            <span id="pageNumber" class="text-gray-600">Page 1</span>
+            <button id="nextPage" class="btn bg-blue-500 hover:bg-blue-600 text-white hidden" onclick="changePage(1)">
+                Next ➡️
+            </button>
+        </div>
     </div>
 </div>
 
-       
-    </div>
+<!-- Hidden container (keeping this for compatibility if needed) -->
+<div id="questionsContainer" class="hidden">
+    <!-- This container is now hidden but kept for compatibility -->
 </div>
+
+
+</div>
+</div>
+
+
+
+
 
 <!-- Compare Training Tab -->
 <div id="compare" class="tab-content">
@@ -1081,18 +1106,13 @@ body::before {
 </div>
 
             
-
  <!-- Pre/Post Assessment Tab -->
  <div id="pre-post" class="tab-content">
     <div class="gradient-card">
         <h3 class="text-xl font-semibold text-pink-500 mb-4">📚 Assessment Set Generator</h3>
 
         <!-- ℹ️ Instruction Message -->
-        <div class="mb-4 p-3 bg-pink-50 border border-pink-200 rounded text-sm text-pink-700 shadow-sm">
-            👉 Please select a <strong>Class</strong> and <strong>Subject</strong> first, then click <strong>"Refresh Books"</strong>.<br>
-            After that, select a <strong>Book</strong> and click <strong>"Refresh Chapters"</strong>.<br>
-            Finally, choose a <strong>Chapter</strong> and you're ready to click <strong>"Generate Quizzes"</strong>! 🎯
-        </div>
+        
 
         <!-- Horizontal Form Layout -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -1575,14 +1595,34 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-
-
-
-
-
-
-
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get references to the dropdown elements
+        const bookDropdown = document.getElementById('prePostBook');
+        const chapterDropdown = document.getElementById('prePostChapter');
+        
+        // Book dropdown click handler
+        bookDropdown.addEventListener('mousedown', function(event) {
+            // Check if the dropdown is empty (only has the default option)
+            if (this.options.length <= 1) {
+                event.preventDefault(); // Prevent the dropdown from opening
+                alert('Please click on "Refresh Books" button first to load available books.');
+            }
+        });
+        
+        // Chapter dropdown click handler
+        chapterDropdown.addEventListener('mousedown', function(event) {
+            // Check if the dropdown is empty (only has the default option)
+            if (this.options.length <= 1) {
+                event.preventDefault(); // Prevent the dropdown from opening
+                alert('Please click on "Refresh Chapters" button first to load available chapters.');
+            }
+        });
+    });
+    </script>
+
 
 
 <script>
@@ -2436,5 +2476,8 @@ function generateMockQuizData() {
     </script>
 
     <canvas id="successRateChart"></canvas>
+
+
+    
 </body>
 </html>
