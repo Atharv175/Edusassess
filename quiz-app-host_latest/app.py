@@ -678,9 +678,6 @@ def get_books_and_chapters():
     return jsonify({"books": books, "chapters": chapters})
 
 
-
-
-
 @app.route("/fetch_filtered_questions", methods=["POST"])
 def fetch_filtered_questions():
     data = request.get_json()
@@ -695,17 +692,21 @@ def fetch_filtered_questions():
     with connect_db() as conn:
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT id, question, correct_answer FROM questions
+            SELECT id, question, option1, option2, option3, option4, correct_answer FROM questions
             WHERE class_level = ? AND subject = ? AND book_name = ? AND chapter = ?
         """, (class_level, subject, book_name, chapter))
         
-        questions = [{"id": row[0], "question": row[1], "correct_answer": row[2]} for row in cursor.fetchall()]
+        questions = [{
+            "id": row[0], 
+            "question": row[1], 
+            "option1": row[2], 
+            "option2": row[3], 
+            "option3": row[4], 
+            "option4": row[5], 
+            "correct_answer": row[6]
+        } for row in cursor.fetchall()]
 
     return jsonify({"questions": questions})
-
-
-
-
 
 
 
