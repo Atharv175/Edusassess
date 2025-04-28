@@ -44,27 +44,7 @@ function createQuiz() {
 }
 
 // Function to load available quizzes into the dropdown
-function loadQuizzes() {
-    fetch("/get_quizzes")
-    .then(response => response.json())
-    .then(data => {
-        let quizList = document.getElementById("quizList");
-        quizList.innerHTML = ""; // Clear old options to prevent duplicates
 
-        let defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.textContent = "Select a Quiz";
-        quizList.appendChild(defaultOption);
-
-        data.forEach(quiz => {
-            let option = document.createElement("option");
-            option.value = quiz.id;
-            option.textContent = quiz.title;
-            quizList.appendChild(option);
-        });
-    })
-    .catch(error => console.error("Error loading quizzes:", error));
-}
 
 // Function to add a question to a selected quiz
 // Function to add a question to a selected quiz
@@ -1288,39 +1268,81 @@ function startPollingForNextQuestion() {
 
 
 
-
-
-
+// Function to load only the latest 10 quizzes into the dropdown
 function loadQuizzes() {
-    let quizList = document.getElementById("quizList");
-
-    if (!quizList) {
-        console.error("❌ quizList dropdown not found in DOM! Ensure script is at the bottom.");
-        return;
-    }
-
     console.log("📢 Fetching Quizzes...");
 
     fetch("/get_quizzes")
     .then(response => response.json())
     .then(data => {
-        console.log("📥 API Response:", data); // Debugging API response
+        console.log("📥 Total quizzes received:", data.length);
+        
+        let quizList = document.getElementById("quizList");
+        // Clear dropdown completely
+        quizList.innerHTML = "";
 
-        let dropdownHTML = `<option value="">Select a Quiz</option>`;
+        // Add default option
+        let defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.textContent = "Select a Quiz";
+        quizList.appendChild(defaultOption);
 
         if (!Array.isArray(data) || data.length === 0) {
-            dropdownHTML = `<option value="">No quizzes available</option>`;
-        } else {
-            data.forEach(quiz => {
-                console.log(`📌 Adding Quiz: ID=${quiz.id}, Title=${quiz.title}`);
-                dropdownHTML += `<option value="${quiz.id}">${quiz.title} (${quiz.category})</option>`;
-            });
+            console.log("No quizzes available");
+            let emptyOption = document.createElement("option");
+            emptyOption.value = "";
+            emptyOption.textContent = "No quizzes available";
+            emptyOption.disabled = true;
+            quizList.appendChild(emptyOption);
+            return;
         }
 
-        quizList.innerHTML = dropdownHTML; // ✅ Apply the new HTML
-        console.log("✅ Dropdown Updated Successfully!");
+        // Make a copy of the data array to avoid modifying the original
+        let quizzes = [...data];
+        
+        // Sort quizzes by ID in descending order (assuming newer quizzes have higher IDs)
+        quizzes.sort((a, b) => {
+            // Parse IDs as integers to ensure proper numeric sorting
+            return parseInt(b.id) - parseInt(a.id);
+        });
+        
+        // Explicitly take only the first 10 quizzes
+        let recentQuizzes = quizzes.slice(0, 10);
+        console.log("📊 Limiting to 10 most recent quizzes:", recentQuizzes.length);
+
+                    // Add the 10 most recent quizzes
+        let count = 0;
+        recentQuizzes.forEach(quiz => {
+            if (count < 10) { // Double-check to ensure only 10 are added
+                let option = document.createElement("option");
+                option.value = quiz.id;
+                option.textContent = `ID: ${quiz.id} - ${quiz.title} ${quiz.category ? `(${quiz.category})` : ''}`;
+                quizList.appendChild(option);
+                count++;
+                console.log(`📌 Added quiz #${count}: ID=${quiz.id}, Title=${quiz.title}`);
+            }
+        });
+
+        // Add note about showing limited quizzes if there are more than 10
+        if (data.length > 10) {
+            let seperatorOption = document.createElement("option");
+            seperatorOption.disabled = true;
+            seperatorOption.textContent = "─────────────────────";
+            quizList.appendChild(seperatorOption);
+            
+            let noteOption = document.createElement("option");
+            noteOption.disabled = true;
+            noteOption.textContent = `Showing 10 most recent of ${data.length} quizzes`;
+            quizList.appendChild(noteOption);
+        }
+        
+        console.log("✅ Dropdown updated with 10 most recent quizzes");
     })
-    .catch(error => console.error("❌ Error loading quizzes:", error));
+    .catch(error => {
+        console.error("❌ Error loading quizzes:", error);
+        let quizList = document.getElementById("quizList");
+        quizList.innerHTML = "<option value=''>Error loading quizzes</option>";
+    });
 }
 
 
