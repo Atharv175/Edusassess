@@ -346,6 +346,12 @@ def join_quiz():
                 waiting_participants[game_pin_str] = []
             
             from datetime import datetime
+            import pytz 
+            # For Indian Standard Time (for example)
+            ist = pytz.timezone('Asia/Kolkata')
+            ist_now = datetime.now(ist)
+            join_time = ist_now.strftime("%H:%M:%S IST")
+            
             waiting_participants[game_pin_str].append({
                 'player_name': player_name,
                 'phone_number': phone_number,
@@ -710,7 +716,6 @@ def fetch_filtered_questions():
 
 
 
-
 @app.route("/generate_pre_post_quiz", methods=["POST"])
 def generate_pre_post_quiz():
     try:
@@ -726,22 +731,22 @@ def generate_pre_post_quiz():
         with connect_db() as conn:
             cursor = conn.cursor()
 
-            # Fetch available questions from DB
+            # Fetch available questions (DISTINCT to avoid duplicates)
             cursor.execute("""
-                SELECT id, question, option1, option2, option3, option4, correct_answer 
+                SELECT DISTINCT question, option1, option2, option3, option4, correct_answer 
                 FROM questions
                 WHERE class_level = ? AND subject = ? AND book_name = ? AND chapter = ?
             """, (class_level, subject, book_name, chapter))
 
-            questions = cursor.fetchall()
+            fetched_questions = cursor.fetchall()
 
-        if len(questions) < 20:
-            return jsonify({"error": "Not enough questions to create two separate quizzes!"}), 400
+        if len(fetched_questions) < 20:
+            return jsonify({"error": "Not enough unique questions to create two separate quizzes!"}), 400
 
-        # Shuffle and split questions
-        random.shuffle(questions)
-        pre_quiz_questions = questions[:10]
-        post_quiz_questions = questions[10:20]
+        # Shuffle and split unique questions
+        random.shuffle(fetched_questions)
+        pre_quiz_questions = fetched_questions[:10]
+        post_quiz_questions = fetched_questions[10:20]
 
         with connect_db() as conn:
             cursor = conn.cursor()
@@ -755,7 +760,7 @@ def generate_pre_post_quiz():
                 cursor.execute("""
                     INSERT INTO questions (quiz_id, class_level, subject, book_name, chapter, question, option1, option2, option3, option4, correct_answer)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (pre_quiz_id, class_level, subject, book_name, chapter, *q[1:]))
+                """, (pre_quiz_id, class_level, subject, book_name, chapter, *q))
 
             # Insert Post-Assessment Quiz
             cursor.execute("INSERT INTO quizzes (title, category) VALUES (?, ?)", 
@@ -766,7 +771,7 @@ def generate_pre_post_quiz():
                 cursor.execute("""
                     INSERT INTO questions (quiz_id, class_level, subject, book_name, chapter, question, option1, option2, option3, option4, correct_answer)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (post_quiz_id, class_level, subject, book_name, chapter, *q[1:]))
+                """, (post_quiz_id, class_level, subject, book_name, chapter, *q))
 
             conn.commit()
 
@@ -778,13 +783,6 @@ def generate_pre_post_quiz():
 
     except Exception as e:
         return jsonify({"error": f"Server error: {str(e)}"}), 500
-
-
-
-
-
-
-
 
 
 
