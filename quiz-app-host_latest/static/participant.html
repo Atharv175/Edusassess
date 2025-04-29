@@ -7,13 +7,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
-            --gov-primary: #205493;          /* Standard government blue */
-            --gov-secondary: #112e51;        /* Darker blue for contrast */
-            --gov-accent: #02bfe7;           /* Light blue accent */
-            --gov-light: #f1f9fc;            /* Very light blue tint for background */
-            --gov-border: #dce4ef;           /* Light blue-gray for borders */
-            --gov-text: #212121;             /* Dark gray for text */
-            --gov-header-bg: #ffffff;        /* White header background */
+            --gov-primary: #205493;
+            --gov-secondary: #112e51;
+            --gov-accent: #02bfe7;
+            --gov-light: #f1f9fc;
+            --gov-border: #dce4ef;
+            --gov-text: #212121;
+            --gov-header-bg: #ffffff;
         }
         body {
             background-color: var(--gov-light);
@@ -33,7 +33,7 @@
         }
         .gov-card {
             background-color: #ffffff;
-            border: 1px solid var(--gov-border);
+            border: 0.5px solid var(--gov-border);
             border-radius: 4px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
@@ -110,14 +110,13 @@
         </div>
     </header>
 
-    <div class="max-w-4xl mx-auto my-8 px-4">
+    <div class="max-w-4xl mx-auto my-8 px-4 relative">
+        <!-- Join Form Card -->
         <div class="gov-card p-8">
             <h2 class="section-title text-2xl text-center">Join a Quiz</h2>
-            
 
             <!-- Join Form -->
             <div id="joinForm">
-
                 <div class="form-group">
                     <label for="Name" class="gov-label">Name</label>
                     <input id="Name" class="gov-input" placeholder="Enter your full name">
@@ -158,18 +157,21 @@
                     Join Quiz
                 </button>
             </div>
+        </div>
 
-            <!-- Quiz Questions -->
-            <div id="quizContainer" class="hidden mt-8 text-center quiz-container p-6">
-                <h3 id="questionText" class="text-xl font-semibold text-gray-800 mb-6"></h3>
-                
-                <div id="options" class="mt-6 grid grid-cols-2 gap-4">
-                    <!-- Options will be dynamically inserted here -->
-                </div>
-                
-                <div class="mt-6">
-                    <h4 id="timer" class="timer-display text-lg"></h4>
-                </div>
+        <!-- Quiz Container OVERLAYING -->
+        <div id="quizContainer"
+     class="hidden absolute top-0 left-0 w-full max-w-4xl mx-auto z-10 
+            bg-white border border-gray-300 p-8 rounded-md shadow-lg h-auto">
+
+            <h3 id="questionText" class="w-full h-24 flex items-center justify-center text-xl font-semibold text-gray-800 mb-6 bg-gray-100 rounded-md"></h3>
+            
+            <div id="options" class="mt-6 grid grid-cols-2 gap-4">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+
+            <div class="mt-6">
+                <h4 id="timer" class="timer-display text-lg"></h4>
             </div>
         </div>
     </div>
