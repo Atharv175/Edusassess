@@ -448,10 +448,12 @@ document.getElementById("nextQuestionBtn").style.display = "none";
         document.getElementById("hostQuizContainer").innerHTML = `
             <div class="p-6 bg-white bg-opacity-90 rounded-lg shadow-md text-center">
                 <h3 class="text-xl font-bold text-green-600 mb-4">Quiz Completed!</h3>
-                <p class="text-gray-700">All questions have been completed. You can check the results in the Leaderboard and Analysis tabs.</p>
+                <p class="text-gray-700 mb-4">All questions have been completed. You can check the results in the Leaderboard and Analysis tabs.</p>
+                <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow">Refresh Page</button>
             </div>
         `;
     }
+    
 }
 
 // Timer function - unchanged
@@ -1344,6 +1346,44 @@ function loadQuizzes() {
         quizList.innerHTML = "<option value=''>Error loading quizzes</option>";
     });
 }
+
+
+
+
+
+
+
+
+function openQuestionsModal() {
+    document.getElementById('questions-modal').classList.remove('hidden');
+}
+
+function closeQuestionsModal() {
+    document.getElementById('questions-modal').classList.add('hidden');
+}
+
+function showModalTab(tab) {
+    if (tab === 'pre') {
+        document.getElementById('modal-pre-content').classList.remove('hidden');
+        document.getElementById('modal-post-content').classList.add('hidden');
+
+        document.getElementById('modal-pre-tab').classList.add('text-blue-600', 'border-blue-600');
+        document.getElementById('modal-pre-tab').classList.remove('text-gray-500');
+        
+        document.getElementById('modal-post-tab').classList.remove('text-blue-600', 'border-blue-600');
+        document.getElementById('modal-post-tab').classList.add('text-gray-500');
+    } else {
+        document.getElementById('modal-pre-content').classList.add('hidden');
+        document.getElementById('modal-post-content').classList.remove('hidden');
+
+        document.getElementById('modal-post-tab').classList.add('text-blue-600', 'border-blue-600');
+        document.getElementById('modal-post-tab').classList.remove('text-gray-500');
+        
+        document.getElementById('modal-pre-tab').classList.remove('text-blue-600', 'border-blue-600');
+        document.getElementById('modal-pre-tab').classList.add('text-gray-500');
+    }
+}
+
 
 
 // ✅ Run this when page loads
@@ -2272,29 +2312,41 @@ function generatePrePostQuiz() {
 // ✅ Fetch Books for Pre/Post Quiz Section
 // ✅ New Sure-Shot Fetch Books Function
 // ✅ New Sure-Shot Fetch Books Function
+
 function fetchBooksForPrePost() {
     let class_level = document.getElementById("prePostClass").value;
     let subject = document.getElementById("prePostSubject").value;
     let bookSelect = document.getElementById("prePostBook");
 
+    // Clear chapters when books change
+    document.getElementById("prePostChapter").innerHTML = "<option value=''>Select Chapter</option>";
+
     if (!class_level || !subject) {
-        console.warn("⚠️ Select Class & Subject first! Resetting Book dropdown.");
+        console.log("⚠️ Please select Class and Subject first!");
         bookSelect.innerHTML = "<option value=''>Select Book</option>";
         return;
     }
 
-    console.log(`📤 Fetching Books for: Class ${class_level}, Subject ${subject}`);
+    console.log(`Fetching books for Class ${class_level}, Subject ${subject}`);
+    
+    // Show loading indicator in the book dropdown
+    bookSelect.innerHTML = "<option value=''>Loading books...</option>";
 
     fetch("/get_books", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ class_level, subject })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        console.log("📥 API Response for Books:", data);
+        console.log("Books data received:", data);
 
-        // Clear existing options
+        // Clear the dropdown and add default option
         bookSelect.innerHTML = "<option value=''>Select Book</option>";
 
         if (data.books && data.books.length > 0) {
@@ -2304,21 +2356,58 @@ function fetchBooksForPrePost() {
                 option.textContent = book;
                 bookSelect.appendChild(option);
             });
-            console.log("✅ Books added to dropdown:", data.books);
+            console.log(`✅ ${data.books.length} books loaded successfully`);
         } else {
-            console.warn("⚠️ No books found!");
-            bookSelect.innerHTML = "<option value=''>No books found</option>";
+            console.log("No books found for the selected class and subject");
+            bookSelect.innerHTML = "<option value=''>No books available</option>";
         }
     })
-    .catch(error => console.error("❌ Error fetching books:", error));
+    .catch(error => {
+        console.error("Error fetching books:", error);
+        bookSelect.innerHTML = "<option value=''>Error loading books</option>";
+    });
 }
 
-// ✅ Attach Events Correctly on Page Load
-document.addEventListener("DOMContentLoaded", function () {
-    console.log("🚀 Adding event listeners for Class & Subject dropdowns");
 
-    document.getElementById("prePostClass").addEventListener("change", fetchBooksForPrePost);
-    document.getElementById("prePostSubject").addEventListener("change", fetchBooksForPrePost);
+
+
+// ✅ Attach Events Correctly on Page Load
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("🚀 DOMContentLoaded - Setting up event listeners");
+    
+    // Add change event listeners to automatically fetch books and chapters
+    const prePostClassSelect = document.getElementById("prePostClass");
+    const prePostSubjectSelect = document.getElementById("prePostSubject");
+    const prePostBookSelect = document.getElementById("prePostBook");
+    
+    if (prePostClassSelect && prePostSubjectSelect) {
+        console.log("✅ Adding event listeners to class and subject selects");
+        
+        // When class or subject changes, fetch books
+        prePostClassSelect.addEventListener("change", function() {
+            console.log("🔄 Class changed, fetching books...");
+            fetchBooksForPrePost();
+        });
+        
+        prePostSubjectSelect.addEventListener("change", function() {
+            console.log("🔄 Subject changed, fetching books...");
+            fetchBooksForPrePost();
+        });
+    } else {
+        console.error("❌ Could not find class or subject select elements");
+    }
+    
+    if (prePostBookSelect) {
+        console.log("✅ Adding event listener to book select");
+        
+        // When book changes, fetch chapters
+        prePostBookSelect.addEventListener("change", function() {
+            console.log("🔄 Book changed, fetching chapters...");
+            fetchChaptersForPrePost();
+        });
+    } else {
+        console.error("❌ Could not find book select element");
+    }
 });
 
 
@@ -2327,6 +2416,51 @@ function debugFetchBooks() {
     console.log("🚀 Manually triggering fetchBooksForPrePost()");
     fetchBooksForPrePost();
 }
+
+// Initialize the event listeners when the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("Setting up event listeners for Assessment Set Generator");
+    
+    // Get references to the dropdown elements
+    const classSelect = document.getElementById("prePostClass");
+    const subjectSelect = document.getElementById("prePostSubject");
+    const bookSelect = document.getElementById("prePostBook");
+    
+    if (classSelect && subjectSelect && bookSelect) {
+        // Set up event listeners for automatic fetching
+        classSelect.addEventListener("change", function() {
+            console.log("Class selection changed");
+            fetchBooksForPrePost();
+        });
+        
+        subjectSelect.addEventListener("change", function() {
+            console.log("Subject selection changed");
+            fetchBooksForPrePost();
+        });
+        
+        bookSelect.addEventListener("change", function() {
+            console.log("Book selection changed");
+            fetchChaptersForPrePost();
+        });
+        
+        console.log("✅ Event listeners set up successfully");
+    } else {
+        console.error("❌ Could not find one or more dropdown elements");
+    }
+    
+    // Keep existing buttons functional as fallbacks
+    const refreshBooksBtn = document.querySelector('button[onclick="debugFetchBooks()"]');
+    const refreshChaptersBtn = document.querySelector('button[onclick="fetchChaptersForPrePost()"]');
+    
+    if (refreshBooksBtn) {
+        console.log("'Refresh Books' button found, preserving functionality");
+    }
+    
+    if (refreshChaptersBtn) {
+        console.log("'Refresh Chapters' button found, preserving functionality");
+    }
+});
+
 
 // Attach Events on Page Load
 document.addEventListener("DOMContentLoaded", function () {
@@ -2379,6 +2513,10 @@ function fetchBooksAndChapters() {
 // Function to Fetch Chapters when a Book is Selected
 
 // Function to Fetch Chapters when a Book is Selected
+
+// Function to fetch chapters for Pre/Post Quiz section
+
+// Function to fetch chapters for the Pre/Post Assessment Generator
 function fetchChaptersForPrePost() {
     let class_level = document.getElementById("prePostClass").value;
     let subject = document.getElementById("prePostSubject").value;
@@ -2386,36 +2524,50 @@ function fetchChaptersForPrePost() {
     let chapterSelect = document.getElementById("prePostChapter");
 
     if (!class_level || !subject || !book_name) {
-        console.warn("⚠️ Please select Class, Subject, and Book first!");
+        console.log("⚠️ Please select Class, Subject, and Book first!");
         chapterSelect.innerHTML = "<option value=''>Select Chapter</option>";
         return;
     }
 
-    console.log(`📤 Fetching Chapters for: Class ${class_level}, Subject ${subject}, Book ${book_name}`);
+    console.log(`Fetching chapters for Class ${class_level}, Subject ${subject}, Book ${book_name}`);
+    
+    // Show loading indicator in the chapter dropdown
+    chapterSelect.innerHTML = "<option value=''>Loading chapters...</option>";
 
     fetch("/get_chapters", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ class_level, subject, book_name })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
-        console.log("📥 API Response for Chapters:", data); // Debugging
+        console.log("Chapters data received:", data);
 
-        chapterSelect.innerHTML = "<option value=''>Select Chapter</option>"; // Reset dropdown
+        // Clear the dropdown and add default option
+        chapterSelect.innerHTML = "<option value=''>Select Chapter</option>";
 
-        if (data.chapters.length > 0) {
+        if (data.chapters && data.chapters.length > 0) {
             data.chapters.forEach(chapter => {
                 let option = document.createElement("option");
                 option.value = chapter;
                 option.textContent = chapter;
                 chapterSelect.appendChild(option);
             });
+            console.log(`✅ ${data.chapters.length} chapters loaded successfully`);
         } else {
-            chapterSelect.innerHTML = "<option value=''>No chapters found</option>";
+            console.log("No chapters found for the selected book");
+            chapterSelect.innerHTML = "<option value=''>No chapters available</option>";
         }
     })
-    .catch(error => console.error("❌ Error fetching chapters:", error));
+    .catch(error => {
+        console.error("Error fetching chapters:", error);
+        chapterSelect.innerHTML = "<option value=''>Error loading chapters</option>";
+    });
 }
 
 // ✅ Attach event listener to Book Dropdown
