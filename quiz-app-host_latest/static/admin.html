@@ -1166,18 +1166,18 @@ body::before {
             
             <div class="form-group flex items-end">
                 <button onclick="generatePrePostQuiz()" class="btn w-full bg-pink-500 hover:bg-pink-600 text-white">
-                    <i class="fas fa-magic"></i> Generate Assesment Set
+                    <i class="fas fa-magic"></i> Generate
                 </button>
             </div>
         </div>
 
         <!-- Debug/Control Buttons -->
         <div class="flex space-x-2 mt-4">
-            <button onclick="debugFetchBooks()" class="btn bg-gray-500 hover:bg-gray-600 text-white text-xs">
-                🔍 Refresh Books
+            <button onclick="debugFetchBooks()" class="btn bg-blue-500 hover:bg-blue-600 text-white text-xs">
+                📚 Refresh Books
             </button>
-            <button onclick="fetchChaptersForPrePost()" class="btn bg-gray-500 hover:bg-gray-600 text-white text-xs">
-                🔄 Refresh Chapters
+            <button onclick="fetchChaptersForPrePost()" class="btn bg-blue-500 hover:bg-blue-600 text-white text-xs">
+                📖 Refresh Chapters
             </button>
         </div>
         <!-- Success Message -->
@@ -1209,11 +1209,13 @@ body::before {
        
         <div id="quizQuestionsContainer" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
             <!-- This inner div controls the modal box itself -->
-            <div class="bg-white rounded-lg shadow-xl p-6 m-4 max-w-2xl w-auto max-h-[80vh] overflow-y-auto">
+            <div class="bg-white rounded-2xl shadow-2xl transform transition-all duration-300 p-6 m-4 w-full max-w-2xl max-h-[80vh] overflow-hidden">
                 <!-- Modal header with close button -->
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold text-gray-700">Quiz Questions</h3>
-                    <button onclick="closeQuizModal()" class="text-gray-500 hover:text-gray-700">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-xl font-semibold text-gray-800 flex items-center"> 🧠 <span class="ml-2">Quiz Questions</span>
+
+                    </h3>
+                    <button onclick="closeQuizModal()" class="text-gray-400 hover:text-gray-600 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
@@ -1221,13 +1223,12 @@ body::before {
                 </div>
                 
                 <!-- Quiz selection -->
-                <div class="form-group mb-4">
-                    <label class="form-label block mb-1">Select Quiz:</label>
-                    <select id="quizSelect" class="form-control form-select w-full p-2 border rounded">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Select Quiz:</label>
+                    <select id="quizSelect" class="w-full border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Select Quiz</option>
                     </select>
                 </div>
-                
                 <button onclick="fetchQuizQuestions()" class="btn bg-blue-500 hover:bg-blue-600 text-white mt-2 px-4 py-2 rounded">
                     🔍 Show Questions
                 </button>
@@ -1239,7 +1240,7 @@ body::before {
         
         <!-- Button to open the modal -->
         <button onclick="openQuizModal()" class="btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-            📝 View Quiz Questions
+            📝 View Set Questions
         </button>
     </div>
 
@@ -2555,43 +2556,7 @@ function generateMockQuizData() {
 
     <canvas id="successRateChart"></canvas>
 
-    /**
- * Improved Assessment Set Generator script
- * This script automatically fetches books when class/subject changes
- * and automatically fetches chapters when book changes
- */
-
-// Initialize the event listeners when the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", function() {
-    console.log("Setting up event listeners for Assessment Set Generator");
-    
-    // Get references to the dropdown elements
-    const classSelect = document.getElementById("prePostClass");
-    const subjectSelect = document.getElementById("prePostSubject");
-    const bookSelect = document.getElementById("prePostBook");
-    
-    if (classSelect && subjectSelect && bookSelect) {
-        // Set up event listeners for automatic fetching
-        classSelect.addEventListener("change", function() {
-            console.log("Class selection changed");
-            fetchBooksForPrePost();
-        });
-        
-        subjectSelect.addEventListener("change", function() {
-            console.log("Subject selection changed");
-            fetchBooksForPrePost();
-        });
-        
-        bookSelect.addEventListener("change", function() {
-            console.log("Book selection changed");
-            fetchChaptersForPrePost();
-        });
-        
-        console.log("✅ Event listeners set up successfully");
-    } else {
-        console.error("❌ Could not find one or more dropdown elements");
-    }
-});
+   
 
 
     
