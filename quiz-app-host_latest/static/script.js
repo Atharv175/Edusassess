@@ -544,7 +544,7 @@ function showQuestionResults() {
     });
 }
 
-// Chart creation function - unchanged
+// Chart creation function - modified to display percentages
 function createResponseChart(labels, data, correctAnswer) {
     const ctx = document.getElementById('responseChart').getContext('2d');
     
@@ -555,25 +555,25 @@ function createResponseChart(labels, data, correctAnswer) {
     
     // Prepare chart colors (highlight correct answer)
     const backgroundColors = labels.map(label => 
-        label === correctAnswer ? 'rgba(34, 197, 94, 0.6)' : 'rgba(99, 102, 241, 0.6)'
+        label === correctAnswer ? 'rgba(34, 197, 94, 0.6)' : 'rgb(255, 0, 0)'
     );
     
     const borderColors = labels.map(label => 
-        label === correctAnswer ? 'rgb(21, 128, 61)' : 'rgb(79, 70, 229)'
+        label === correctAnswer ? 'rgb(21, 128, 61)' : 'rgb(255, 0, 0)'
     );
     
     // Calculate percentages for display
     const total = data.reduce((sum, value) => sum + value, 0) || 1; // Avoid division by zero
     const percentages = data.map(value => ((value / total) * 100).toFixed(1));
     
-    // Create new chart
+    // Create new chart with percentage data
     responseChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Response Count',
-                data: data,
+                label: 'Response Percentage',
+                data: percentages, // Use percentages instead of raw counts
                 backgroundColor: backgroundColors,
                 borderColor: borderColors,
                 borderWidth: 1,
@@ -592,22 +592,25 @@ function createResponseChart(labels, data, correctAnswer) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            const value = context.raw;
+                            const rawValue = data[context.dataIndex];
                             const percentage = percentages[context.dataIndex];
-                            return `${value} responses (${percentage}%)`;
+                            return `${rawValue} responses (${percentage}%)`;
                         }
                     }
                 }
             },
             scales: {
-                y: {
+                x: {
                     beginAtZero: true,
+                    max: 100, // Set the maximum to 100%
                     title: {
                         display: true,
-                        text: 'Number of Responses'
+                        text: 'Percentage of Responses'
                     },
                     ticks: {
-                        precision: 0
+                        callback: function(value) {
+                            return value + '%';
+                        }
                     }
                 }
             }
@@ -1049,7 +1052,7 @@ function showQuestion() {
 
         questionData.options.forEach(option => {
             let button = document.createElement("button");
-            button.classList = "w-full p-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-md option-btn";
+            button.classList = "w-full h-24 p-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-md option-btn";
             button.innerText = option;
             button.onclick = () => selectAnswer(option, button);
             optionsContainer.appendChild(button);
@@ -1536,7 +1539,7 @@ function fetchPerformanceAnalysis() {
         updatePerformanceSummary(data);
         
         // 📊 Update Score Distribution Chart
-        updateChart("scoreChart", "Score Distribution", data.participants, data.scores, "rgba(75, 192, 192, 0.6)");
+        updateChart("scoreChart", "Score Distribution", data.participants, data.scores, "#2ECC71");
 
         // ✅❌ Update Accuracy Chart
         updateChart("accuracyChart", "Correct vs Incorrect", ["Correct", "Incorrect"], [data.correct, data.incorrect], ["#2ECC71", "#E74C3C"]);
@@ -1713,6 +1716,7 @@ function updatePercentiles(scores) {
 }
 
 // Generic function to update charts (existing function)
+// Generic function to update charts with percentage support for Correct vs Incorrect
 function updateChart(chartId, label, labels, data, backgroundColor) {
     const ctx = document.getElementById(chartId).getContext('2d');
     
@@ -1723,31 +1727,60 @@ function updateChart(chartId, label, labels, data, backgroundColor) {
     
     // Create chart type based on data
     let chartType = 'bar';
+    let chartData = data; // Default to using original data
+    
+    // Build chart options based on the Score Distribution chart style
     let chartOptions = {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
         plugins: {
             legend: {
-                display: label === "Correct vs Incorrect"
+                display: label === "Correct vs Incorrect" // Only show legend for Correct vs Incorrect
+            },
+            title: {
+                display: true,
+                text: label
             }
         },
         scales: {
             y: {
-                beginAtZero: true
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: label === "Correct vs Incorrect" ? 'Percentage of Responses' : 'Count'
+                },
+                ticks: {
+                    precision: label === "Correct vs Incorrect" ? 1 : 0
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: label === "Correct vs Incorrect" ? 'Response Type' : 'Category'
+                }
             }
         }
     };
     
-    // For the accuracy pie chart
+    // Special handling for Correct vs Incorrect charts
     if (label === "Correct vs Incorrect") {
-        chartType = 'pie';
-        chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right'
-                }
+        // Calculate percentages for the data
+        const total = data.reduce((sum, val) => sum + val, 0) || 1; // Avoid division by zero
+        chartData = data.map(value => (value / total) * 100);
+        
+        // Update chart options for percentage display
+        chartOptions.scales.y = {
+            beginAtZero: true,
+            max: 100, // Set max to 100%
+            title: {
+                display: true,
+                text: 'Percentage of Responses'
+            },
+            ticks: {
+                callback: function(value) {
+                    return value + '%';
+                },
+                precision: 0
             }
         };
     }
@@ -1759,7 +1792,7 @@ function updateChart(chartId, label, labels, data, backgroundColor) {
             labels: labels,
             datasets: [{
                 label: label,
-                data: data,
+                data: chartData,
                 backgroundColor: Array.isArray(backgroundColor) ? backgroundColor : [backgroundColor],
                 borderColor: Array.isArray(backgroundColor) 
                     ? backgroundColor.map(color => color.replace('0.6', '1')) 
@@ -1770,8 +1803,6 @@ function updateChart(chartId, label, labels, data, backgroundColor) {
         options: chartOptions
     });
 }
-
-
 
 function fetchQuizAnalysis() {
     fetch("/quiz_analysis", {
@@ -1790,26 +1821,7 @@ function fetchQuizAnalysis() {
 
 
 // 📊 Function to Update Charts
-function updateChart(chartId, label, labels, values, colors) {
-    let ctx = document.getElementById(chartId).getContext("2d");
-    
-    new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [{
-                label: label,
-                data: values,
-                backgroundColor: Array.isArray(colors) ? colors : [colors],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-}
+
 
 
 // 🧠 Upload File & Generate AI Questions
